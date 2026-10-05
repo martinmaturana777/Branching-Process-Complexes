@@ -1,6 +1,6 @@
 # Proceso de ramificación en complejos celulares
 
-Simulación estocástica de un sistema de partículas con **ramificación y aniquilación** sobre el complejo cúbico $\mathbb{Z}^d$, restringido a una caja finita. Proyecto del curso **Simulación Estocástica** (Ingeniería Civil Matemática, Universidad de Chile, Primavera 2026), basado en el trabajo en preparación *Branching process on complexes* de D. Cid y A. Sepúlveda.
+Simulación estocástica de un sistema de partículas con **ramificación y aniquilación** sobre el complejo cúbico $\mathbb{Z}^d$, restringido a una caja finita. Proyecto del curso **Simulación Estocástica** (Ingeniería Civil Matemática, Universidad de Chile, Primavera 2026) en conjunto con Bruno Guevara, basado en el trabajo en preparación *Branching process on complexes* de D. Cid y A. Sepúlveda.
 
 <p align="center">
   <img src="img/ramificacion_arbol.gif" width="49%" alt="Dinámica en Z^2 con absorción en un árbol generador">
@@ -53,4 +53,4 @@ Para generar los videos se necesita además `ffmpeg`.
 - T. M. Liggett. *Interacting Particle Systems*, Springer (1985).
 - D. T. Gillespie. *Exact stochastic simulation of coupled chemical reactions*, J. Phys. Chem. (1977).
 
-**Autor:** Martín Maturana Acevedo
+**Autores:** Martín Maturana Acevedo y Bruno Guevara
