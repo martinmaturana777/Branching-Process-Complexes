@@ -11,7 +11,7 @@ Simulación estocástica de un sistema de partículas con **ramificación y aniq
 
 Una configuración $\theta \in \mathbb{Z}^{E^+}$ asigna a cada arista una cantidad entera de partículas con signo. En cada evento, una partícula sobre la arista $e$ elige una cara $f$ que la contiene: la partícula se aniquila y nacen partículas en el resto del borde de $f$,
 
-$$\theta \longmapsto \theta - \langle e, \partial f\rangle \operatorname{sgn}(\theta_e)\, \partial f .$$
+$$\theta \longmapsto \theta - \langle e, \partial f\rangle \text{sgn}(\theta_e)\, \partial f .$$
 
 Las partículas de signo opuesto que caen en una misma arista se aniquilan, y las que llegan a un conjunto absorbente $T$ mueren. El generador cumple $\mathcal{L} I(\theta) = -\Delta_1^{\uparrow}\theta$, donde $\Delta_1^{\uparrow}$ es el Laplaciano de Hodge superior.
 
