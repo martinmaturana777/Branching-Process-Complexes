@@ -17,16 +17,16 @@ Las partículas de signo opuesto que caen en una misma arista se aniquilan, y la
 
 ## Qué hace el notebook
 
-1. **Topología del complejo.** Construye vértices, aristas y caras de la caja $[0,n_1]\times\cdots\times[0,n_d]$ en coordenadas dobladas (solo enteros), para cualquier dimensión $d$.
-2. **Operadores de frontera y Laplacianos de Hodge.** Arma $\partial_1$, $\partial_2$ y $\Delta_1 = \Delta_1^{\downarrow} + \Delta_1^{\uparrow}$ como matrices dispersas (SciPy) y verifica $\partial\partial = 0$.
-3. **Condiciones de absorción.** Implementa tres variantes: absorción en un árbol generador (el caso del paper), en el borde de la caja o sin absorción. También explica por qué hace falta el árbol para que el proceso se extinga.
-4. **Motor estocástico.** Simulación exacta en tiempo continuo (algoritmo de Gillespie), con actualizaciones locales $O(1)$ y registro de la trayectoria independiente del tamaño de la caja.
-5. **Verificación numérica de la teoría.**
-   - El drift estimado por Monte Carlo coincide con la fórmula cerrada $-\Delta^{\uparrow}\theta$.
-   - Cota de Lyapunov $\mathcal{L}\|\theta\|_2^2 \le C_d\|\theta\|_1 - 2\|\nabla\theta\|_2^2$ (Teorema 2.1).
-   - Constante de Poincaré y cantidades conservadas (Lema 2.3).
-6. **Tiempo de extinción.** Monte Carlo con réplicas independientes y reproducibles (`SeedSequence.spawn`); la cola empírica $\mathbb{P}(\tau > t)$ es compatible con decaimiento exponencial.
-7. **El caso $\mathbb{Z}^3$.** Videos 3D y una observación sobre la meseta cuasi-estacionaria que aparece por la pequeña constante de Poincaré.
+1. **Complejo cúbico y operadores.** Construye vértices, aristas y caras de la caja $[0,n_1]\times\cdots\times[0,n_d]$ en coordenadas dobladas (solo enteros), para cualquier dimensión $d$. Arma $\partial_1$, $\partial_2$ y $\Delta_1 = \Delta_1^{\downarrow} + \Delta_1^{\uparrow}$ como matrices dispersas (SciPy).
+2. **Condiciones de absorción.** Absorción en un árbol generador (el caso del paper), en el borde de la caja o sin absorción. Incluye un árbol generador que evita la condición inicial.
+3. **Motor estocástico.** Simulación exacta en tiempo continuo (algoritmo de Gillespie), con actualizaciones locales $O(1)$ y registro de la trayectoria independiente del tamaño de la caja.
+4. **Configuraciones iniciales y reconstrucción** de la trayectoria a partir del proceso de alturas.
+5. **Visualización** en 2D y 3D.
+6. **Videos** en $\mathbb{Z}^2$ y $\mathbb{Z}^3$, y una observación sobre la meseta cuasi-estacionaria en 3D.
+7. **Condición inicial: cuadrado y cubo.** Ocho escenarios que combinan la dimensión (2D o 3D), la condición inicial (unitaria o bloque de lado 3 aleatorio) y la absorción (árbol o borde de la caja).
+8. **Probabilidad de extinción.** Funciones de supervivencia $\mathbb{P}(\tau>t)$ y tasas de la cola, calculadas con miles de réplicas reproducibles en paralelo (`joblib`). Se varía la condición inicial, el número de partículas, el tamaño de la caja, el conjunto absorbente, el reloj y la dimensión. **Resultado principal:** con el árbol fijo, la tasa de extinción no depende de la condición inicial y coincide con la constante de Poincaré, $\gamma(T)\approx c'(T)$ (correlación 0.95 en 40 árboles).
+
+Las verificaciones de la teoría ($\partial\partial=0$, el drift $-\Delta^{\uparrow}\theta$, la cota de Lyapunov del Teorema 2.1 y Poincaré) y la explicación detallada del código están en el documento de explicación (PDF).
 
 ## Videos
 
@@ -36,6 +36,14 @@ Las partículas de signo opuesto que caen en una misma arista se aniquilan, y la
 | [`ramificacion_borde.mp4`](videos/ramificacion_borde.mp4) | $\mathbb{Z}^2$, absorción en el borde de la caja, partiendo de un lazo |
 | [`ramificacion_3d_arbol.mp4`](videos/ramificacion_3d_arbol.mp4) | $\mathbb{Z}^3$, una sola partícula inicial, absorción en un árbol |
 | [`ramificacion_3d_borde.mp4`](videos/ramificacion_3d_borde.mp4) | $\mathbb{Z}^3$, absorción en la superficie de la caja |
+| [`inicial_cuadrado_arbol.mp4`](videos/inicial_cuadrado_arbol.mp4) | $\mathbb{Z}^2$, cuadrado unitario ($+1$ en sus 4 aristas), absorción en un árbol |
+| [`inicial_cuadrado_borde.mp4`](videos/inicial_cuadrado_borde.mp4) | $\mathbb{Z}^2$, cuadrado unitario, absorción en el borde de la caja |
+| [`inicial_bloque2d_arbol.mp4`](videos/inicial_bloque2d_arbol.mp4) | $\mathbb{Z}^2$, bloque $3\times3$ con aristas ocupadas al azar ($p=1/2$), absorción en un árbol |
+| [`inicial_bloque2d_borde.mp4`](videos/inicial_bloque2d_borde.mp4) | $\mathbb{Z}^2$, bloque $3\times3$ aleatorio, absorción en el borde de la caja |
+| [`inicial_cubo_arbol.mp4`](videos/inicial_cubo_arbol.mp4) | $\mathbb{Z}^3$, cubo unitario ($+1$ en sus 12 aristas), absorción en un árbol |
+| [`inicial_cubo_borde.mp4`](videos/inicial_cubo_borde.mp4) | $\mathbb{Z}^3$, cubo unitario, absorción en la superficie de la caja |
+| [`inicial_bloque3d_arbol.mp4`](videos/inicial_bloque3d_arbol.mp4) | $\mathbb{Z}^3$, bloque $3\times3\times3$ aleatorio, absorción en un árbol |
+| [`inicial_bloque3d_borde.mp4`](videos/inicial_bloque3d_borde.mp4) | $\mathbb{Z}^3$, bloque $3\times3\times3$ aleatorio, absorción en la superficie de la caja |
 
 ## Cómo ejecutarlo
 
