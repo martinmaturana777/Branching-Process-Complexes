@@ -3,8 +3,8 @@
 Simulación estocástica de un sistema de partículas con **ramificación y aniquilación** sobre el complejo cúbico $\mathbb{Z}^d$, restringido a una caja finita. Proyecto del curso **Simulación Estocástica** (Ingeniería Civil Matemática, Universidad de Chile, Primavera 2026) en conjunto con Bruno Guevara, basado en el trabajo en preparación *Branching process on complexes* de D. Cid y A. Sepúlveda.
 
 <p align="center">
-  <img src="img/ramificacion_arbol.gif" width="49%" alt="Dinámica en Z^2 con absorción en un árbol generador">
-  <img src="img/ramificacion_3d_arbol.gif" width="49%" alt="Dinámica en Z^3 con absorción en un árbol generador">
+  <img src="img/z2_10particulas_arbol.gif" width="49%" alt="Z^2: 10 partículas con absorción en un árbol generador, hasta la extinción">
+  <img src="img/z3_lazo_sin_arbol.gif" width="49%" alt="Z^3: lazo unitario sin absorción, hasta la extinción">
 </p>
 
 ## El modelo
@@ -22,33 +22,32 @@ Las partículas de signo opuesto que caen en una misma arista se aniquilan, y la
 3. **Motor estocástico.** Simulación exacta en tiempo continuo (algoritmo de Gillespie), con actualizaciones locales $O(1)$ y registro de la trayectoria independiente del tamaño de la caja.
 4. **Configuraciones iniciales y reconstrucción** de la trayectoria a partir del proceso de alturas.
 5. **Visualización** en 2D y 3D.
-6. **Videos** en $\mathbb{Z}^2$ y $\mathbb{Z}^3$, y una observación sobre la meseta cuasi-estacionaria en 3D.
-7. **Condición inicial: cuadrado y cubo.** Ocho escenarios que combinan la dimensión (2D o 3D), la condición inicial (unitaria o bloque de lado 3 aleatorio) y la absorción (árbol o borde de la caja).
-8. **Probabilidad de extinción.** Funciones de supervivencia $\mathbb{P}(\tau>t)$ y tasas de la cola, calculadas con miles de réplicas reproducibles en paralelo (`joblib`). Se varía la condición inicial, el número de partículas, el tamaño de la caja, el conjunto absorbente, el reloj y la dimensión. **Resultado principal:** con el árbol fijo, la tasa de extinción no depende de la condición inicial y coincide con la constante de Poincaré, $\gamma(T)\approx c'(T)$ (correlación 0.95 en 40 árboles).
+6. **Réplicas, condiciones iniciales y absorción.** Réplicas reproducibles en paralelo (`joblib`), el lazo unitario $\partial f$, $N$ partículas al azar, y conjuntos absorbentes (ninguno, árbol generador, o las primeras $k$ aristas de un orden de agregación).
+7. **Videos** en $\mathbb{Z}^2$ y $\mathbb{Z}^3$ (ver abajo).
+8. **Probabilidad de extinción según el número de aristas absorbentes.** Se agregan aristas al conjunto absorbente $T$ con distintas reglas (uniforme, árbol aleatorio, BFS desde el centro o desde una esquina), tanto como familia fija $T_0\subset T_1\subset\cdots$ como creciendo durante la simulación, en cajas $9\times9$ y $9\times9\times9$. Resultados principales:
+   - **Cargas conservadas.** Para cada componente $C$ del grafo $(V,T)$, la carga $Q_C=\sum_{v\in C}(\partial_1\theta)(v)$ se conserva. La extinción es posible si y solo si todas son nulas, lo que se verificó sin excepciones en 2400 simulaciones. La probabilidad de extinción *eventual* resulta un problema de conectividad (percolación) del grafo $(V,T)$, se calcula exactamente y es monótona en $T$.
+   - **La extinción en tiempo finito no es monótona.** Para el lazo, agregar aristas absorbentes la hace más lenta, y que $T$ crezca más rápido también, porque cortar el lazo impide que se aniquile solo.
+   - **En $\mathbb{Z}^3$** la extinción temprana se satura en $\approx 0.3$–$0.4$ aunque la extinción eventual sea segura: el resto escapa a una meseta de cientos de partículas.
 
 Las verificaciones de la teoría ($\partial\partial=0$, el drift $-\Delta^{\uparrow}\theta$, la cota de Lyapunov del Teorema 2.1 y Poincaré) y la explicación detallada del código están en el documento de explicación (PDF).
 
 ## Videos
 
-| Video | Descripción |
-|---|---|
-| [`ramificacion_arbol.mp4`](videos/ramificacion_arbol.mp4) | $\mathbb{Z}^2$, absorción en un árbol generador aleatorio |
-| [`ramificacion_borde.mp4`](videos/ramificacion_borde.mp4) | $\mathbb{Z}^2$, absorción en el borde de la caja, partiendo de un lazo |
-| [`ramificacion_3d_arbol.mp4`](videos/ramificacion_3d_arbol.mp4) | $\mathbb{Z}^3$, una sola partícula inicial, absorción en un árbol |
-| [`ramificacion_3d_borde.mp4`](videos/ramificacion_3d_borde.mp4) | $\mathbb{Z}^3$, absorción en la superficie de la caja |
-| [`inicial_cuadrado_arbol.mp4`](videos/inicial_cuadrado_arbol.mp4) | $\mathbb{Z}^2$, cuadrado unitario ($+1$ en sus 4 aristas), absorción en un árbol |
-| [`inicial_cuadrado_borde.mp4`](videos/inicial_cuadrado_borde.mp4) | $\mathbb{Z}^2$, cuadrado unitario, absorción en el borde de la caja |
-| [`inicial_bloque2d_arbol.mp4`](videos/inicial_bloque2d_arbol.mp4) | $\mathbb{Z}^2$, bloque $3\times3$ con aristas ocupadas al azar ($p=1/2$), absorción en un árbol |
-| [`inicial_bloque2d_borde.mp4`](videos/inicial_bloque2d_borde.mp4) | $\mathbb{Z}^2$, bloque $3\times3$ aleatorio, absorción en el borde de la caja |
-| [`inicial_cubo_arbol.mp4`](videos/inicial_cubo_arbol.mp4) | $\mathbb{Z}^3$, cubo unitario ($+1$ en sus 12 aristas), absorción en un árbol |
-| [`inicial_cubo_borde.mp4`](videos/inicial_cubo_borde.mp4) | $\mathbb{Z}^3$, cubo unitario, absorción en la superficie de la caja |
-| [`inicial_bloque3d_arbol.mp4`](videos/inicial_bloque3d_arbol.mp4) | $\mathbb{Z}^3$, bloque $3\times3\times3$ aleatorio, absorción en un árbol |
-| [`inicial_bloque3d_borde.mp4`](videos/inicial_bloque3d_borde.mp4) | $\mathbb{Z}^3$, bloque $3\times3\times3$ aleatorio, absorción en la superficie de la caja |
+| Video | Caja | Condición inicial | Absorción |
+|---|---|---|---|
+| [`z2_lazo_sin_arbol.mp4`](videos/z2_lazo_sin_arbol.mp4) | $7\times7$ | lazo unitario $\partial f$ | ninguna (hasta la extinción) |
+| [`z2_lazo_con_arbol.mp4`](videos/z2_lazo_con_arbol.mp4) | $7\times7$ | lazo unitario $\partial f$ | árbol generador (hasta la extinción) |
+| [`z2_10particulas_arbol.mp4`](videos/z2_10particulas_arbol.mp4) | $7\times7$ | 10 partículas $+1$ | árbol generador (hasta la extinción) |
+| [`z3_10particulas_arbol_meseta.mp4`](videos/z3_10particulas_arbol_meseta.mp4) | $7\times7\times7$ | 10 partículas $+1$ | árbol generador (crecimiento y meseta) |
+| [`z3_lazo_sin_arbol.mp4`](videos/z3_lazo_sin_arbol.mp4) | $3\times3\times3$ | lazo unitario $\partial f$ | ninguna (hasta la extinción) |
+| [`z3_lazo_con_arbol.mp4`](videos/z3_lazo_con_arbol.mp4) | $3\times3\times3$ | lazo unitario $\partial f$ | árbol generador (hasta la extinción) |
+
+En los videos de lazo se muestra, con una regla fija, la primera réplica que se ramifica y después se extingue. En $\mathbb{Z}^3$ la extinción después de ramificarse solo se alcanza a observar en cajas muy pequeñas; en $7\times7\times7$ el proceso queda en una meseta de cientos de partículas.
 
 ## Cómo ejecutarlo
 
 ```bash
-pip install numpy scipy matplotlib jupyter
+pip install numpy scipy matplotlib joblib jupyter
 jupyter notebook branching_process_complexes.ipynb
 ```
 
