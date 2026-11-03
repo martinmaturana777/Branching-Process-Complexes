@@ -56,8 +56,6 @@ Para generar los videos se necesita además `ffmpeg`.
 ## Referencias
 
 - D. Cid, A. Sepúlveda. *Branching process on complexes*, borrador (2026).
-- S. Mukherjee, J. Steenbergen. *Random walks on simplicial complexes and harmonics*, Random Structures & Algorithms (2016).
-- T. M. Liggett. *Interacting Particle Systems*, Springer (1985).
-- D. T. Gillespie. *Exact stochastic simulation of coupled chemical reactions*, J. Phys. Chem. (1977).
+
 
 **Autores:** Martín Maturana Acevedo y Bruno Guevara
