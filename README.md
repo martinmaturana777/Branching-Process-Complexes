@@ -4,7 +4,7 @@ Simulación estocástica de un sistema de partículas con **ramificación y aniq
 
 <p align="center">
   <img src="img/z2_10particulas_arbol.gif" width="49%" alt="Z^2: 10 partículas con absorción en un árbol generador, hasta la extinción">
-  <img src="img/z3_lazo_sin_arbol.gif" width="49%" alt="Z^3: lazo unitario sin absorción, hasta la extinción">
+  <img src="img/z3_lazo_con_arbol.gif" width="49%" alt="Z^3: lazo unitario con absorción en un árbol, corrido hasta la extinción">
 </p>
 
 ## El modelo
@@ -39,12 +39,11 @@ Las verificaciones de la teoría ($\partial\partial=0$, el drift $-\Delta^{\upar
 | [`z2_lazo_con_arbol.mp4`](videos/z2_lazo_con_arbol.mp4) | $7\times7$ | lazo unitario $\partial f$ | árbol generador (hasta la extinción) |
 | [`z2_10particulas_arbol.mp4`](videos/z2_10particulas_arbol.mp4) | $7\times7$ | 10 partículas $+1$ | árbol generador (hasta la extinción) |
 | [`z3_10particulas_arbol_meseta.mp4`](videos/z3_10particulas_arbol_meseta.mp4) | $7\times7\times7$ | 10 partículas $+1$ | árbol generador (crecimiento y meseta) |
-| [`z3_lazo_sin_arbol.mp4`](videos/z3_lazo_sin_arbol.mp4) | $3\times3\times3$ | lazo unitario $\partial f$ | ninguna (hasta la extinción) |
-| [`z3_lazo_con_arbol.mp4`](videos/z3_lazo_con_arbol.mp4) | $3\times3\times3$ | lazo unitario $\partial f$ | árbol generador (hasta la extinción) |
-| [`meme_cruz_giratoria.mp4`](videos/meme_cruz_giratoria.mp4) ([GIF](videos/meme_cruz_giratoria.gif)) | $14\times14$ | cruz de aristas que gira | animación ilustrativa, no es una simulación |
-| [`meme_anillo_oscilante.mp4`](videos/meme_anillo_oscilante.mp4) ([GIF](videos/meme_anillo_oscilante.gif)) | $15\times15$ | anillo $\partial_2(\text{disco})$ que se encoge hasta el lazo $\partial f$ y vuelve a crecer | animación ilustrativa, no es una simulación |
+| [`z3_lazo_con_arbol.mp4`](videos/z3_lazo_con_arbol.mp4) | $3\times3\times3$ | lazo unitario $\partial f$ | árbol generador: corrido hasta que se extingue, sin seleccionar (decenas de millones de eventos, en cámara rápida) |
+| [`ninja_cruz.mp4`](videos/ninja_cruz.mp4) ([GIF](videos/ninja_cruz.gif)) | $14\times14$ | 8 partículas $+1$ | *Stochastic Ninja Warrior*: obstáculo en forma de cruz que gira |
+| [`ninja_anillo.mp4`](videos/ninja_anillo.mp4) ([GIF](videos/ninja_anillo.gif)) | $15\times15$ | 8 partículas $+1$ | *Stochastic Ninja Warrior*: anillo $\partial_2(\text{disco})$ que se encoge hasta el lazo $\partial f$ y vuelve a crecer |
 
-Los árboles generadores (conjunto absorbente) se dibujan en verde pálido. En los videos de lazo se muestra, con una regla fija, la primera réplica que se ramifica y después se extingue. En $\mathbb{Z}^3$ la extinción después de ramificarse solo se alcanza a observar en cajas muy pequeñas; en $7\times7\times7$ el proceso queda en una meseta de cientos de partículas.
+Los conjuntos absorbentes se dibujan en verde pálido. En los videos *Stochastic Ninja Warrior* el conjunto absorbente es un obstáculo que se mueve y elimina a las partículas que toca. En los dos videos de lazo en $\mathbb{Z}^2$ se muestra, con una regla fija, la primera réplica que se ramifica y después se extingue; los demás usan la primera semilla, sin selección. En $\mathbb{Z}^3$ la extinción después de la meseta solo se alcanza a observar en cajas muy pequeñas: el video $3\times3\times3$ se dejó correr hasta que se extinguió y se muestra en cámara rápida. En $7\times7\times7$ el proceso queda en una meseta de cientos de partículas.
 
 ## Cómo ejecutarlo
 
