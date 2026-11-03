@@ -29,7 +29,7 @@ Las partículas de signo opuesto que caen en una misma arista se aniquilan, y la
    - **La extinción en tiempo finito no es monótona.** Para el lazo, agregar aristas absorbentes la hace más lenta, y que $T$ crezca más rápido también, porque cortar el lazo impide que se aniquile solo.
    - **En $\mathbb{Z}^3$** la extinción temprana se satura en $\approx 0.3$–$0.4$ aunque la extinción eventual sea segura: el resto escapa a una meseta de cientos de partículas.
 
-Las verificaciones de la teoría ($\partial\partial=0$, el drift $-\Delta^{\uparrow}\theta$, la cota de Lyapunov del Teorema 2.1 y Poincaré), la explicación detallada del código y los **fundamentos de la estimación** (exactitud del algoritmo de Gillespie, estimador de Bernoulli, intervalos de Wilson, censura, cálculo exacto vía cargas y teoría cuasi-estacionaria) están en el documento [`explicacion/explicacion_notebook.pdf`](explicacion/explicacion_notebook.pdf).
+
 
 ## Videos
 
