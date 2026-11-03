@@ -24,7 +24,7 @@ Las partículas de signo opuesto que caen en una misma arista se aniquilan, y la
 5. **Visualización** en 2D y 3D.
 6. **Réplicas, condiciones iniciales y absorción.** Réplicas reproducibles en paralelo (`joblib`), el lazo unitario $\partial f$, $N$ partículas al azar, y conjuntos absorbentes (ninguno, árbol generador, o las primeras $k$ aristas de un orden de agregación).
 7. **Videos** en $\mathbb{Z}^2$ y $\mathbb{Z}^3$ (ver abajo).
-8. **Probabilidad de extinción según el número de aristas absorbentes.** Se agregan aristas al conjunto absorbente $T$ con distintas reglas (uniforme, árbol aleatorio, BFS desde el centro o desde una esquina), tanto como familia fija $T_0\subset T_1\subset\cdots$ como creciendo durante la simulación, en cajas $9\times9$ y $9\times9\times9$. Resultados principales:
+8. **Probabilidad de extinción según el número de aristas absorbentes.** Se agregan aristas al conjunto absorbente $T$ con distintas reglas (uniforme, árbol aleatorio y BFS desde el centro), tanto como familia fija $T_0\subset T_1\subset\cdots$ como creciendo durante la simulación, en cajas $9\times9$ y $9\times9\times9$. Resultados principales:
    - **Cargas conservadas.** Para cada componente $C$ del grafo $(V,T)$, la carga $Q_C=\sum_{v\in C}(\partial_1\theta)(v)$ se conserva. La extinción es posible si y solo si todas son nulas, lo que se verificó sin excepciones en 2400 simulaciones. La probabilidad de extinción *eventual* resulta un problema de conectividad (percolación) del grafo $(V,T)$, se calcula exactamente y es monótona en $T$.
    - **La extinción en tiempo finito no es monótona.** Para el lazo, agregar aristas absorbentes la hace más lenta, y que $T$ crezca más rápido también, porque cortar el lazo impide que se aniquile solo.
    - **En $\mathbb{Z}^3$** la extinción temprana se satura en $\approx 0.3$–$0.4$ aunque la extinción eventual sea segura: el resto escapa a una meseta de cientos de partículas.
@@ -41,8 +41,10 @@ Las verificaciones de la teoría ($\partial\partial=0$, el drift $-\Delta^{\upar
 | [`z3_10particulas_arbol_meseta.mp4`](videos/z3_10particulas_arbol_meseta.mp4) | $7\times7\times7$ | 10 partículas $+1$ | árbol generador (crecimiento y meseta) |
 | [`z3_lazo_sin_arbol.mp4`](videos/z3_lazo_sin_arbol.mp4) | $3\times3\times3$ | lazo unitario $\partial f$ | ninguna (hasta la extinción) |
 | [`z3_lazo_con_arbol.mp4`](videos/z3_lazo_con_arbol.mp4) | $3\times3\times3$ | lazo unitario $\partial f$ | árbol generador (hasta la extinción) |
+| [`meme_cruz_giratoria.mp4`](videos/meme_cruz_giratoria.mp4) ([GIF](videos/meme_cruz_giratoria.gif)) | $14\times14$ | cruz de aristas que gira | animación ilustrativa, no es una simulación |
+| [`meme_anillo_oscilante.mp4`](videos/meme_anillo_oscilante.mp4) ([GIF](videos/meme_anillo_oscilante.gif)) | $15\times15$ | anillo $\partial_2(\text{disco})$ que se encoge hasta el lazo $\partial f$ y vuelve a crecer | animación ilustrativa, no es una simulación |
 
-En los videos de lazo se muestra, con una regla fija, la primera réplica que se ramifica y después se extingue. En $\mathbb{Z}^3$ la extinción después de ramificarse solo se alcanza a observar en cajas muy pequeñas; en $7\times7\times7$ el proceso queda en una meseta de cientos de partículas.
+Los árboles generadores (conjunto absorbente) se dibujan en verde pálido. En los videos de lazo se muestra, con una regla fija, la primera réplica que se ramifica y después se extingue. En $\mathbb{Z}^3$ la extinción después de ramificarse solo se alcanza a observar en cajas muy pequeñas; en $7\times7\times7$ el proceso queda en una meseta de cientos de partículas.
 
 ## Cómo ejecutarlo
 
