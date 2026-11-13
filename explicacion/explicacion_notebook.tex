@@ -945,6 +945,21 @@ En \fn{run_growing_absorption}, $T$ parte vacío y, antes de los eventos número
 \label{fig:aristas-dinamico}
 \end{figure}
 
+\paragraph{Videos de $T$ creciendo.} El notebook incluye tres corridas individuales de este experimento, con la regla del árbol aleatorio en la caja $9\times9$ (\fn{run_growing_recorded}, \fn{animate_growing}). Esta función repite exactamente las llamadas al generador aleatorio de \fn{run_growing_absorption}, pero guarda el estado después de cada evento. Cada cuadro muestra $T$ en verde, con la arista recién agregada más oscura, y un marcador con el evento, el tiempo, las aristas absorbentes ($k$ de $|V|-1=99$), la población y las partículas absorbidas. A la derecha se ven la población y $|T|$ en función de los eventos.
+\begin{itemize}[nosep]
+  \item \textbf{Una partícula}, $m=10$, primera semilla: se extingue en 582 eventos, con 59 de las 99 aristas del árbol, en cuanto sus extremos quedan conectados.
+  \item \textbf{Lazo}, $m=1$: con la primera semilla el lazo se extingue en el primer evento, así que se usa la regla declarada de los videos 1 y 2 (la primera réplica que alcanza 8 partículas antes de extinguirse; la cumple el 29\,\% de las réplicas). El árbol se completa en el evento 99 y el lazo, ya cortado en cadenas, sobrevive casi 100 eventos más: se extingue en el evento 193.
+  \item \textbf{10 partículas}, $m=10$, primera semilla: se extinguen en 1\,752 eventos, después de que el árbol se completa.
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.49\textwidth]{figuras/vid_T_creciente_1particula.png}\hfill
+\includegraphics[width=0.49\textwidth]{figuras/vid_T_creciente_lazo.png}
+\caption{Cuadros de los videos de $T$ creciendo: una partícula con $m=10$ (izquierda) y el lazo con $m=1$ (derecha). La arista verde oscura es la recién agregada.}
+\label{fig:T-creciente-videos}
+\end{figure}
+
 \subsection{Resultados en \texorpdfstring{$\Z^3$}{Z3}}
 
 En la caja $9\times9\times9$ la extinción eventual sigue estando dada por las cargas, pero en la práctica casi nunca se observa. Por eso se compara con la probabilidad de \textbf{extinción temprana}

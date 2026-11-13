@@ -41,6 +41,9 @@ Las partículas de signo opuesto que caen en una misma arista se aniquilan, y la
 | [`z3_10particulas_arbol_meseta.mp4`](videos/z3_10particulas_arbol_meseta.mp4) | $7\times7\times7$ | 10 partículas $+1$ | árbol generador (crecimiento y meseta) |
 | [`z3_lazo_con_arbol.mp4`](videos/z3_lazo_con_arbol.mp4) | $3\times3\times3$ | lazo unitario $\partial f$ | árbol generador: corrido hasta que se extingue, sin seleccionar (decenas de millones de eventos, en cámara rápida) |
 | [`z3_10particulas_hasta_extincion.mp4`](videos/z3_10particulas_hasta_extincion.mp4) | $3\times3\times3$ | 10 partículas $+1$ | árbol generador: corrido hasta que se extingue, sin seleccionar (90 617 992 eventos, en cámara rápida) |
+| [`z2_T_creciente_1particula.mp4`](videos/z2_T_creciente_1particula.mp4) | $9\times9$ | 1 partícula | árbol aleatorio que **crece durante la simulación** (una arista cada 10 eventos) |
+| [`z2_T_creciente_lazo.mp4`](videos/z2_T_creciente_lazo.mp4) | $9\times9$ | lazo unitario $\partial f$ | árbol aleatorio que crece en cada evento |
+| [`z2_T_creciente_10particulas.mp4`](videos/z2_T_creciente_10particulas.mp4) | $9\times9$ | 10 partículas $+1$ | árbol aleatorio que crece cada 10 eventos |
 | [`ninja_cruz.mp4`](videos/ninja_cruz.mp4) ([GIF](videos/ninja_cruz.gif)) | $14\times14$ | 8 partículas $+1$ | *Stochastic Ninja Warrior*: obstáculo en forma de cruz que gira |
 | [`ninja_anillo.mp4`](videos/ninja_anillo.mp4) ([GIF](videos/ninja_anillo.gif)) | $15\times15$ | 8 partículas $+1$ | *Stochastic Ninja Warrior*: anillo $\partial_2(\text{disco})$ que se encoge hasta el lazo $\partial f$ y vuelve a crecer |
 
