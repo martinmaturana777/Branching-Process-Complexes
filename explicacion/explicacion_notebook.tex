@@ -874,9 +874,8 @@ Una regla produce un orden de aristas $e_1,e_2,\dots$ y la familia creciente $T_
 \begin{description}[style=nextline, leftmargin=1.2em, font=\normalfont]
   \item[uniforme (\fn{order_uniform})] Orden aleatorio de todas las aristas. Llega a ser generador recién cerca de $|E|$.
   \item[árbol aleatorio (\fn{order_random_tree})] Tipo Kruskal: se recorren las aristas en orden aleatorio y se acepta una solo si une dos componentes distintas. Termina exactamente en un árbol generador en $k=|V|-1$.
-  \item[BFS desde el centro (\fn{order_bfs_tree})] El árbol de búsqueda en anchura desde el vértice central, en orden de descubrimiento de los vértices. Las aristas absorbentes empiezan cerca de la condición inicial. Una versión desde una esquina se probó y se descartó, porque no aportaba información nueva.
 \end{description}
-Las reglas no evitan la condición inicial: las partículas que caen en $T_k$ mueren en $t=0$. Por eso la regla BFS desde el centro mata a una partícula central casi de inmediato.
+Las reglas no evitan la condición inicial: las partículas que caen en $T_k$ mueren en $t=0$. También se probaron árboles BFS, desde el centro y desde una esquina, y se descartaron: no aportaban información nueva y entorpecían la lectura de los gráficos.
 
 \subsection{Cálculo exacto de la probabilidad eventual}
 
@@ -896,16 +895,15 @@ Con 5000 muestras por regla y condición inicial (figura~\ref{fig:aristas-exacta
   \begin{itemize}[nosep]
     \item Las reglas uniforme y árbol aleatorio coinciden hasta $k\approx60$, con $\mathbb{P}(\tau<\infty)$ creciendo casi linealmente.
     \item El árbol aleatorio llega a 1 en $k=|V|-1=99$, por construcción. Con la regla uniforme, en ese mismo $k$ la probabilidad es solo $0.83$, y hacen falta $\approx150$ aristas para llegar a 1.
-    \item BFS desde el centro vale 1 casi desde el comienzo ($k=3$), porque absorbe de inmediato la arista de la partícula.
   \end{itemize}
-  \item \textbf{Diez partículas $+1$.} Hacen falta más aristas: la mediana de $k^\ast$ es 92 con árbol aleatorio y 106 con la regla uniforme, donde $\mathbb{P}(k^\ast\le99)=0.31$. Las curvas BFS tienen escalones, porque el árbol neutraliza grupos de partículas a la vez.
+  \item \textbf{Diez partículas $+1$.} Hacen falta más aristas: la mediana de $k^\ast$ es 92 con árbol aleatorio y 106 con la regla uniforme, donde $\mathbb{P}(k^\ast\le99)=0.31$.
   \item \textbf{Lazo.} $\mathbb{P}(\tau<\infty)=1$ para todo $k$.
 \end{itemize}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figuras/aristas_exacta.png}
-\caption{$\Z^2$, caja $9\times9$: probabilidad de extinción eventual, exacta vía cargas, en función del número de aristas absorbentes, para cuatro reglas. La línea punteada marca $k=|V|-1$.}
+\caption{$\Z^2$, caja $9\times9$: probabilidad de extinción eventual, exacta vía cargas, en función del número de aristas absorbentes, con las reglas uniforme y árbol aleatorio. La línea punteada marca $k=|V|-1$.}
 \label{fig:aristas-exacta}
 \end{figure}
 
@@ -931,7 +929,7 @@ Que la extinción sea posible no dice cuánto tarda. El notebook mide $\mathbb{P
 
 \subsection{\texorpdfstring{$T$}{T} creciendo durante la simulación}
 
-En \fn{run_growing_absorption}, $T$ parte vacío y, antes de los eventos número $0,m,2m,\dots$, se agrega la siguiente arista del orden. Las partículas que estén sobre ella mueren en ese momento. Esto sigue hasta completar el orden, que para las reglas de árbol es un árbol generador; desde ahí la extinción está garantizada. Se miden $\mathbb{E}[\tau]$ y $\mathbb{P}(\tau\le50)$ en función de $m$, con 600 réplicas por punto (figura~\ref{fig:aristas-dinamico}).
+En \fn{run_growing_absorption}, $T$ parte vacío y, antes de los eventos número $0,m,2m,\dots$, se agrega la siguiente arista del orden. Las partículas que estén sobre ella mueren en ese momento. Esto sigue hasta completar el orden, que con la regla árbol aleatorio es un árbol generador; desde ahí la extinción está garantizada. Con esa regla se miden $\mathbb{E}[\tau]$ y $\mathbb{P}(\tau\le50)$ en función de $m$, con 600 réplicas por punto (figura~\ref{fig:aristas-dinamico}).
 
 \begin{itemize}
   \item \textbf{Una partícula:} que $T$ crezca más rápido acelera la extinción. Con árbol aleatorio, $\mathbb{E}[\tau]=69$ con $m=1$ frente a $432$ con $m=100$.
@@ -941,7 +939,7 @@ En \fn{run_growing_absorption}, $T$ parte vacío y, antes de los eventos número
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figuras/aristas_dinamico.png}
-\caption{$T$ creciendo durante la simulación: tiempo medio de extinción y $\hat{\mathbb{P}}(\tau\le50)$ en función de $m$ (eventos entre aristas agregadas). Línea continua: una partícula; discontinua: lazo.}
+\caption{$T$ creciendo durante la simulación: tiempo medio de extinción y $\hat{\mathbb{P}}(\tau\le50)$ en función de $m$ (eventos entre aristas agregadas), con la regla árbol aleatorio, para una partícula y para el lazo.}
 \label{fig:aristas-dinamico}
 \end{figure}
 
@@ -969,8 +967,8 @@ q_M=\mathbb{P}\big(\text{extinción antes de alcanzar }\norm{\theta}_1=M\big),\q
 estimada con \fn{l1_max} y 600 réplicas por punto (figura~\ref{fig:aristas-3d}).
 
 \begin{itemize}
-  \item \textbf{Una partícula:} $q_{100}$ sigue a $\mathbb{P}(\tau<\infty)$ para $k$ chico. Con las reglas de árbol, en cambio, se queda en $\approx0.3$--$0.4$ aun cuando la extinción eventual es segura: el resto escapa a la meseta.
-  \item \textbf{Lazo:} $q_{100}\approx0.33$ para todo $k$ con las reglas de árbol. Su extinción temprana es la autoaniquilación de los primeros eventos, en la que $T$ no influye.
+  \item \textbf{Una partícula:} $q_{100}$ sigue a $\mathbb{P}(\tau<\infty)$ para $k$ chico. Con el árbol aleatorio, en cambio, se queda en $\approx0.3$--$0.4$ aun cuando la extinción eventual es segura: el resto escapa a la meseta.
+  \item \textbf{Lazo:} $q_{100}\approx0.33$ para todo $k$ con el árbol aleatorio. Su extinción temprana es la autoaniquilación de los primeros eventos, en la que $T$ no influye.
   \item \textbf{Regla uniforme:} $q_{100}\to1$ solo cuando $T$ cubre la mayoría de las aristas ($k\gtrsim1700$ de $2700$).
 \end{itemize}
 
@@ -1244,7 +1242,6 @@ Algunas consecuencias para interpretar las corridas:
 \begin{enumerate}
   \item \textbf{Accesibilidad.} La dirección ``si las cargas son nulas, la extinción es casi segura'' usa, como el paper, que desde cualquier estado alcanzable se llega a $0$ con probabilidad positiva. No está demostrado; las 2400 réplicas de la verificación lo respaldan.
   \item \textbf{Videos condicionados.} Los dos videos de lazo en 2D muestran la primera réplica que se ramifica y luego se extingue, que no es una trayectoria típica; el notebook reporta qué fracción de réplicas cumple esa condición. Los demás videos usan la primera semilla, y los videos 3D hasta la extinción no tienen ninguna selección.
-  \item \textbf{Regla BFS desde el centro.} Mata casi de inmediato una condición inicial ubicada en el centro, así que es un caso extremo de ``absorber cerca primero''.
   \item \textbf{El árbol aleatorio no es uniforme}: es un árbol generador mínimo con pesos aleatorios (o un Kruskal aleatorio, que da la misma ley). Si importa la ley del árbol, se puede implementar el algoritmo de Wilson.
   \item \textbf{Cada paso cuesta $O(E)$}, porque \fn{rng.choice} normaliza el vector de pesos completo. Para cajas grandes, un árbol de Fenwick permite muestrear en $O(\log E)$.
   \item \textbf{En $\Z^3$ la extinción no es observable en tiempos razonables} salvo en cajas diminutas. Estudiar la meseta requeriría técnicas de eventos raros, como \emph{splitting} o el algoritmo de Fleming--Viot para distribuciones cuasi-estacionarias.

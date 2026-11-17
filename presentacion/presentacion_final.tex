@@ -1,23 +1,9 @@
 % =====================================================================
-%  Presentación final · Procesos de ramificación en complejos celulares
-%  Simulación Estocástica · Primavera 2026
-%
-%  PLAN DE TIEMPOS (~9:15, pareja; cada persona habla >= 3 min)
-%    Bloque 1 · El proyecto y por qué importa ........ ~3:00  (Persona 1)
-%    Bloque 2 · Resultados ............................ ~4:15  (Persona 1 hasta "Cargas
-%                                                               conservadas", luego Persona 2)
-%    Bloque 3 · Conclusiones y pasos futuros ......... ~2:00  (Persona 2, cierra con Ninja)
-%    => Persona 1 ~4:30, Persona 2 ~4:45
-%  Después del "¡Gracias!" hay diapositivas de RESPALDO para las preguntas.
-%  Pauta: 25% globalidad y tiempos · 35% avances · 25% audiovisual · 15% oral
-%
-%  Las líneas "% GUION:" son lo que se dice; NO aparecen en las diapositivas.
-%  Videos: los enlaces "ver video" abren el MP4 en GitHub (tenerlos abiertos aparte).
-% =====================================================================
 \documentclass[aspectratio=169,11pt]{beamer}
 
 \usetheme[progressbar=frametitle, numbering=fraction, sectionpage=progressbar]{metropolis}
 \usepackage[T1]{fontenc}
+\usepackage{animate}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish,es-noshorthands,es-nodecimaldot,es-tabla]{babel}
 \usepackage{amsmath,amssymb,mathtools}
@@ -101,7 +87,150 @@
 \metroset{sectionpage=none}
 \section{El proyecto}
 
-\begin{frame}{De los grafos a los complejos}
+\begin{frame}{Celdas como puntos de $\tfrac12\Z^d$}
+  % GUION (0:30): cada celda del complejo se identifica con su centro. Un vértice tiene todas
+  % sus coordenadas enteras; el punto medio de una arista tiene una coordenada fraccionaria; el
+  % centro de una cara, dos; el de un cubo, tres. Así las k-celdas son simplemente puntos de
+  % (1/2)Z^d con k coordenadas en Z+1/2. El borde también es fácil: se mueve +-1/2 en cada
+  % coordenada fraccionaria, con un signo que fija la orientación (en 2D, antihoraria).
+  % En el código usamos z = 2x: todo son vectores de enteros y una k-celda tiene k coordenadas impares.
+  \centering
+  $k$-celda $\;\longleftrightarrow\;$ punto $x\in\big(\tfrac12\Z\big)^d$ con \alert{$k$ coordenadas en $\Z+\tfrac12$}
+  \vspace{2mm}
+
+      \centering
+      \begin{tikzpicture}[scale=2.7,
+          vert/.style={circle, fill=cafe, inner sep=0pt, minimum size=6pt},
+          edge/.style={circle, fill=dulceosc, inner sep=0pt, minimum size=5pt},
+          face/.style={rectangle, fill=caramelo, draw=dulceosc, inner sep=0pt, minimum size=7pt},
+          lab/.style={font=\footnotesize}]
+        \fill[leche] (0,0) rectangle (1,1);
+        \draw[cafe!60, thick] (0,0) rectangle (1,1);
+        % orientación antihoraria del borde de la cara
+        \foreach \a/\b in {{(0.62,0)/(0.84,0)}, {(1,0.62)/(1,0.84)}, {(0.38,1)/(0.16,1)}, {(0,0.38)/(0,0.16)}}
+          \draw[dulce, very thick, -{Stealth[length=2.6mm]}] \a -- \b;
+        % 0-celdas: ninguna coordenada fraccionaria
+        \node[vert, label={[lab]below left:$(0,0)$}]  at (0,0) {};
+        \node[vert, label={[lab]below right:$(1,0)$}] at (1,0) {};
+        \node[vert, label={[lab]above right:$(1,1)$}] at (1,1) {};
+        \node[vert, label={[lab]above left:$(0,1)$}]  at (0,1) {};
+        % 1-celdas: una coordenada fraccionaria (con su signo en el borde de la cara)
+        \node[edge, label={[lab, dulceosc]below:$+(\tfrac12,0)$}] at (0.5,0) {};
+        \node[edge, label={[lab, dulceosc]right:$+(1,\tfrac12)$}] at (1,0.5) {};
+        \node[edge, label={[lab, dulceosc]above:$-(\tfrac12,1)$}] at (0.5,1) {};
+        \node[edge, label={[lab, dulceosc]left:$-(0,\tfrac12)$}]  at (0,0.5) {};
+        % 2-celda: dos coordenadas fraccionarias
+        \node[face, label={[lab]below:$f=(\tfrac12,\tfrac12)$}] at (0.5,0.5) {};
+      \end{tikzpicture}
+    
+    
+ 
+\end{frame}
+
+\begin{frame}{Operador de borde}
+  % GUION (0:30): el borde de una celda se obtiene moviendo cada coordenada fraccionaria
+  % medio paso hacia adelante (+) y hacia atrás (-), con un signo eps que fija la orientación.
+  % Ejemplo, la cara f=(1/2,1/2): en la dirección 1 da la arista derecha menos la izquierda;
+  % en la dirección 2, con signo -, la de arriba menos la de abajo. Resultado: el recorrido
+  % antihorario. Para una arista da "cabeza menos cola", y siempre se cumple que el borde
+  % de un borde es 0: es lo que usamos después para las cargas conservadas.
+  \centering
+  $\partial x=\sum_{i\,\in\,J_x}\varepsilon_{J_x}(i)\,\Big[\big(x+\tfrac12 e_i\big)-\big(x-\tfrac12 e_i\big)\Big]$\\[1mm]
+  {\small $J_x$ = coordenadas fraccionarias de $x$, \quad $\varepsilon_{J}(i)=(-1)^{\#\{j\in J\,:\,j<i\}}$}
+  \vspace{2mm}
+
+  \begin{columns}[c]
+    \begin{column}{0.42\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=2.5,
+          vert/.style={circle, fill=cafe, inner sep=0pt, minimum size=5pt},
+          pt/.style={circle, inner sep=0pt, minimum size=6pt},
+          face/.style={rectangle, fill=caramelo, draw=dulceosc, inner sep=0pt, minimum size=7pt},
+          lab/.style={font=\footnotesize}]
+        \fill[leche] (0,0) rectangle (1,1);
+        \draw[cafe!40, thick] (0,0) rectangle (1,1);
+        \foreach \p in {(0,0),(1,0),(1,1),(0,1)} \node[vert] at \p {};
+        \node[face, label={[lab]above:$f$}] at (0.5,0.5) {};
+        % i = 1: mover la primera coordenada en ±1/2
+        \uncover<2->{
+          \draw[dulce, thick, dashed, -{Stealth[length=2mm]}] (0.56,0.5) -- (0.93,0.5);
+          \draw[dulce, thick, dashed, -{Stealth[length=2mm]}] (0.44,0.5) -- (0.07,0.5);
+          \node[pt, fill=dulce, label={[lab, dulce]right:$+\,(1,\tfrac12)$}] at (1,0.5) {};
+          \node[pt, fill=dulce, label={[lab, dulce]left:$-\,(0,\tfrac12)$}] at (0,0.5) {};
+        }
+        % i = 2: mover la segunda coordenada en ±1/2 (con ε = -1)
+        \uncover<3->{
+          \draw[cafeleche, thick, dashed, -{Stealth[length=2mm]}] (0.5,0.56) -- (0.5,0.93);
+          \draw[cafeleche, thick, dashed, -{Stealth[length=2mm]}] (0.5,0.44) -- (0.5,0.07);
+          \node[pt, fill=cafeleche, label={[lab, cafeleche]above:$-\,(\tfrac12,1)$}] at (0.5,1) {};
+          \node[pt, fill=cafeleche, label={[lab, cafeleche]below:$+\,(\tfrac12,0)$}] at (0.5,0) {};
+        }
+        % resultado: recorrido antihorario
+        \uncover<4->{
+          \foreach \a/\b in {{(0.66,0)/(0.88,0)}, {(1,0.66)/(1,0.88)}, {(0.34,1)/(0.12,1)}, {(0,0.34)/(0,0.12)}}
+            \draw[dulceosc, very thick, -{Stealth[length=2.6mm]}] \a -- \b;
+        }
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.56\textwidth}
+      Ejemplo: $f=(\tfrac12,\tfrac12)$, \; $J_f=\{1,2\}$
+      \vspace{3mm}
+
+      \uncover<2->{\textcolor{dulce}{$i=1$:} \; $\varepsilon=+1$ \; $\Rightarrow\; +\big[(1,\tfrac12)-(0,\tfrac12)\big]$}\\[2mm]
+      \uncover<3->{\textcolor{cafeleche}{$i=2$:} \; $\varepsilon=-1$ \; $\Rightarrow\; -\big[(\tfrac12,1)-(\tfrac12,0)\big]$}
+      \vspace{4mm}
+
+      \uncover<4->{%
+        $\partial f=(\tfrac12,0)+(1,\tfrac12)-(\tfrac12,1)-(0,\tfrac12)$ \; \alert{$\circlearrowleft$}\\[3mm]
+        {\small arista: $\partial(\tfrac12,0)=(1,0)-(0,0)$ \quad y \quad $\partial\partial f=0$}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Laplaciano up}
+  % GUION (0:30): con el borde se arma el Laplaciano up, Delta = ∂_2 ∂_2^T: a una arista le
+  % aplica el borde de cada cara que la contiene, con el signo de la orientación. Ejemplo:
+  % la arista e, compartida por f1 y f2, recibe un 2 (número de caras que la contienen) y las
+  % otras seis aristas de esas caras reciben +-1. Por qué importa: en el proceso, cada
+  % partícula en e suena con cada cara a tasa 1 y resta <e,∂f> sgn(θ_e) ∂f; sumando, el
+  % cambio esperado de θ es exactamente -Delta θ (porque |θ_e| sgn θ_e = θ_e). La media del
+  % proceso sigue la ecuación del calor de Hodge; la ramificación está en las fluctuaciones.
+  \centering
+  $\Delta_1^{\uparrow}=\partial_2\,\partial_2^{\top},\qquad \Delta_1^{\uparrow}\theta=\sum_{f}\ip{\theta}{\partial f}\,\partial f$
+  \vspace{2mm}
+
+  \begin{columns}[c]
+    \begin{column}{0.38\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=1.55, lab/.style={font=\footnotesize}]
+        \fill[leche] (0.06,0.06) rectangle (0.94,0.94);
+        \fill[leche] (0.06,1.06) rectangle (0.94,1.94);
+        \node at (0.5,0.5) {$f_1$}; \node at (0.5,1.5) {$f_2$};
+        % aristas con coeficiente +
+        \draw[very thick, rojo] (0,1) -- (1,1)     node[midway, above, lab, xshift=-7pt] {$+2$};
+        \draw[very thick, rojo] (0,0) -- (0,1)     node[midway, left, lab] {$+1$};
+        \draw[very thick, rojo] (1,1) -- (1,2)     node[midway, right, lab] {$+1$};
+        % aristas con coeficiente -
+        \draw[very thick, azul] (0,0) -- (1,0)     node[midway, below, lab] {$-1$};
+        \draw[very thick, azul] (0,2) -- (1,2)     node[midway, above, lab] {$-1$};
+        \draw[very thick, azul] (1,0) -- (1,1)     node[midway, right, lab] {$-1$};
+        \draw[very thick, azul] (0,1) -- (0,2)     node[midway, left, lab] {$-1$};
+        \node[lab, rojo] at (0.8,0.86) {$e$};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.58\textwidth}
+      
+      \[
+        \Delta_1^{\uparrow}e=\ip{e}{\partial f_1}\,\partial f_1+\ip{e}{\partial f_2}\,\partial f_2=-\partial f_1+\partial f_2
+      \]
+
+      \alert{En el proceso:} \; $\mathcal{L}I(\theta)=-\Delta_1^{\uparrow}\theta$\\[1mm]
+      {\small la media sigue el calor de Hodge: $\;\mathbb{E}[\theta_t]=e^{-t\Delta_1^{\uparrow}}\theta_0$}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{De los grafos a las Celdas}
   % GUION (0:20): un paseo aleatorio vive en vértices; aquí las partículas viven en aristas
   % y tienen carga (+ rojo, - azul). Las que interactúan son las caras (cuadraditos).
   % La regla: cuando una cara "suena" se le resta su borde. Lo vemos en acción ->
@@ -120,7 +249,7 @@
   $\theta\;\longmapsto\;\theta-\ip{e}{\partial f}\sgn(\theta_e)\,\partial f$
 \end{frame}
 
-\begin{frame}{El proceso: estado inicial}
+\begin{frame}{El proceso}
   % GUION (~1:00 para las 7 diapositivas): en cada evento (1) suena el reloj de una
   % partícula, (2) elige una cara vecina y cada arista del borde recibe ±1, (3) se resta
   % el borde: la partícula muere y nacen otras; ✕ = aniquilación (+ con -), ○ = absorbida
@@ -161,33 +290,36 @@
 \end{frame}
 
 \begin{frame}{¿Por qué estudiarlo?}
-  % GUION (0:45): convencer.
-  %  - Es la versión "de dimensión alta" de los procesos de ramificación y paseos aleatorios:
-  %    en vez de vértices, aristas y caras; la geometría la da el Laplaciano de Hodge.
-  %  - Compiten dos fuerzas: la ramificación (1→3) empuja a crecer, la aniquilación y la
-  %    absorción a morir. ¿Quién gana? Es la pregunta clásica de la extinción.
-  %  - El paper prueba que con un árbol generador se extingue, pero no dice cuándo ni qué
-  %    pasa con otros conjuntos absorbentes: ahí entra la simulación.
+  % GUION (0:45): convencer. Cada clic hace aparecer un cuadro.
+  %  [1] Es la generalización natural de dimensión alta de los procesos de ramificación y paseos
+  %      aleatorios: en vez de vértices, aristas y caras; la geometría la da el Laplaciano de Hodge.
+  %  [2] Compiten dos fuerzas: la ramificación (1→3) empuja a crecer, la aniquilación y la
+  %      absorción a morir. ¿Quién gana? Es la pregunta clásica de la extinción.
+  %  [3] El paper prueba que con un árbol generador se extingue, pero no dice cuándo ni qué
+  %      pasa con otros conjuntos absorbentes: ahí entra la simulación.
   \begin{columns}[T]
     \begin{column}{0.31\textwidth}
-      \begin{block}{Dimensión alta}
-        \centering aristas y caras\\ Laplaciano de Hodge
-      \end{block}
+      \uncover<1->{%
+      \begin{block}{Generalización Natural}
+        \centering Paseo aleatorio \\
+        en dimensión alta
+      \end{block}}
     \end{column}
     \begin{column}{0.31\textwidth}
+      \uncover<2->{%
       \begin{block}{Dos fuerzas}
         \centering ramificación $1\to3$\\ vs.\ aniquilación
-      \end{block}
+      \end{block}}
     \end{column}
     \begin{column}{0.31\textwidth}
-      \begin{alertblock}{Pregunta abierta}
+      \uncover<3->{%
+      \begin{alertblock}{Nuestro objetivo}
         \centering ¿cuándo y cuánto\\ tarda la extinción?
-      \end{alertblock}
+      \end{alertblock}}
     \end{column}
   \end{columns}
   \vspace{5mm}
-  \centering
-  paper: $\;\mathcal{L}I(\theta)=-\Delta_1^{\uparrow}\theta$, \quad árbol generador $\Rightarrow$ extinción
+
 \end{frame}
 
 \begin{frame}{Nuestro enfoque: simulación exacta}
@@ -355,27 +487,31 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Stochastic Ninja Warrior}
-  % GUION (0:30): cierre. ¿Y si el conjunto absorbente se mueve? Cruz que gira y anillo
-  % que oscila; 8 concursantes; cada × es una eliminación. Nadie llega a GAME OVER:
-  % ramificación y eliminaciones se equilibran.
-  \begin{columns}[c]
-    \begin{column}{0.5\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{ninja_cruz.png}\\
-      \video{ninja_cruz.mp4}{ver video}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{ninja_anillo.png}\\
-      \video{ninja_anillo.mp4}{ver video}
-    \end{column}
-  \end{columns}
-\end{frame}
+% \begin{frame}{Stochastic Ninja Warrior}
+%   % GUION (0:30): cierre. ¿Y si el conjunto absorbente se mueve? Cruz que gira y anillo
+%   % que oscila; 8 concursantes; cada × es una eliminación. Nadie llega a GAME OVER:
+%   % ramificación y eliminaciones se equilibran.
+%   \begin{columns}[c]
+%     \begin{column}{0.5\textwidth}
+%       \centering
+%       \includegraphics[width=\linewidth]{ninja_cruz.png}\\
+%       \video{ninja_cruz.mp4}{ver video}
+%     \end{column}
+%     \begin{column}{0.5\textwidth}
+%       \centering
+%       \includegraphics[width=\linewidth]{ninja_anillo.png}\\
+%       \video{ninja_anillo.mp4}{ver video}
+%     \end{column}
+%   \end{columns}
+% \end{frame}
 
 \begin{frame}[standout]
-  ¡Gracias!\\[4mm]
-  {\normalsize ¿Preguntas?}\\[6mm]
+  % GUION: ¡Gracias! Los videos de Stochastic Ninja Warrior corren solos en bucle
+  % (necesita Adobe Acrobat Reader; en otros visores se ve el primer cuadro).
+  ¡Gracias!\\[3mm]
+  \animategraphics[autoplay, loop, width=0.31\textwidth]{10}{figuras/ninja_cruz_anim}{}{}\hspace{6mm}%
+  \animategraphics[autoplay, loop, width=0.31\textwidth]{10}{figuras/ninja_anillo_anim}{}{}\\[4mm]
+  {\normalsize ¿Preguntas?}\\[2mm]
   {\footnotesize \url{https://github.com/martinmaturana777/Branching-Process-Complexes}}
 \end{frame}
 
