@@ -27,7 +27,8 @@
 \definecolor{rojo}{RGB}{214,39,40}
 \definecolor{azul}{RGB}{33,102,194}
 \definecolor{verde}{HTML}{8FD18F}       % conjunto absorbente T, igual que en los videos
-\definecolor{verdeosc}{HTML}{3E8E3E}    % arista recién agregada a T
+\definecolor{verdeosc}{HTML}{3E8E3E}
+\definecolor{trampa}{HTML}{E07B39}     % aristas donde la partícula se extingue    % arista recién agregada a T
 
 \setbeamercolor{normal text}{fg=cafe, bg=crema}
 \setbeamercolor{background canvas}{bg=crema}
@@ -436,7 +437,7 @@
   % puede extinguirse. Una partícula se extingue sii sus extremos quedan conectados por T.
   % Gráfico: en cada réplica se sortea T = k aristas al azar, se calculan las cargas (¿todas
   % nulas?) y se simula el proceso. Matriz 2×2 sumada sobre k = 0, 20, ..., 140 (8000 réplicas,
-  % semilla nueva, independiente del notebook): 52,2 % carga nula y se extinguió (4174), 47,8 %
+  % semilla nueva, independiente del notebook): 52,17 % carga nula y se extinguió (4174), 47,83 %
   % carga no nula y sigue viva (3826). Error tipo I (carga nula pero no se extinguió) y tipo II
   % (carga no nula pero se extinguió): 0 réplicas cada uno; cota de Wilson al 95 %: < 0,1 %.
   % Margen: la extinción más lenta con carga nula tomó 2095 eventos, de un tope de 10 millones.
@@ -459,70 +460,6 @@
   {\centering\footnotesize\color{cafeleche} caja $9\times9$ · 1 partícula en la arista central · $T$ = $k$ aristas al azar, $k=0,20,\dots,140$ ·
   1000 réplicas por $k$ (8000 en total) · hasta $10^7$ eventos (carga nula) o $10^5$ (no nula) ·
   la extinción más lenta tomó 2095\par}
-\end{frame}
-
-\begin{frame}{Extinción vs número de aristas absorbentes}
-  % GUION (0:40) [Persona 2]: la probabilidad de extinción eventual se calcula EXACTA con
-  % las cargas (es conectividad, tipo percolación) y crece con k. El lazo se extingue siempre.
-  \centering
-  \includegraphics[width=\textwidth]{aristas_exacta.png}\\[1mm]
-  {\footnotesize\color{cafeleche} caja $9\times9$ ($|E|=180$) · 1 partícula en la arista central,
-  5000 muestras por curva · IC de Wilson al 95\,\%}
-\end{frame}
-
-\begin{frame}{¿Más absorción, extinción más rápida? No siempre}
-  % GUION (0:40) [Persona 2]: en tiempo finito NO es monótono: para el lazo, agregar
-  % aristas absorbentes hace más lenta la extinción (1.00 → 0.94). Hipótesis: el árbol
-  % corta el lazo en cadenas abiertas. Condiciones (iguales en todos los puntos): caja 9×9,
-  % 1 partícula en la arista central o lazo ∂f de la cara central; T = las primeras k aristas
-  % de la regla (uniforme: orden aleatorio de todas las aristas; árbol aleatorio: Kruskal, que
-  % termina en un árbol generador en k = 99); 1000 réplicas independientes por punto; t* = 50;
-  % barras = Wilson 95 %; línea discontinua = extinción eventual exacta.
-  \centering
-  \includegraphics[width=0.9\textwidth]{aristas_tiempo_finito.png}\\[1mm]
-  {\footnotesize\color{cafeleche} caja $9\times9$ · $|E|=180$ aristas · 1000 réplicas por punto}
-\end{frame}
-
-\begin{frame}{En $\mathbb{Z}^3$: el lazo no se acelera}
-  % GUION (0:30) [Persona 2]: mismo experimento en la caja 5×5×5 (|V| = 216, |E| = 540; el
-  % árbol generador tiene 215 aristas). 1 partícula: más absorción, más rápida, pero con el
-  % árbol completo solo 38,5 % se extingue antes de t = 50 aunque la extinción eventual es
-  % segura (el resto escapa a la meseta). Lazo: ≈ 1/3 para todo k ≤ 215 (0,33–0,37, sin
-  % diferencias significativas): ese tercio se autoaniquila en los primeros eventos, donde T no
-  % influye. Solo sube cuando T uniforme cubre casi toda la caja (0,52 con k = 270, 0,90 con
-  % k = 324). La bajada de 2D no aparece en 3D: ninguna curva baja significativamente.
-  % Código: presentacion/no_monotonia_3d.py y §9.3 del notebook.
-  \centering
-  \includegraphics[width=0.9\textwidth]{aristas_tiempo_finito_3d.png}\\[1mm]
-  {\footnotesize\color{cafeleche} caja $5\times5\times5$ · $|E|=540$ aristas · 1000 réplicas por punto}
-\end{frame}
-
-\begin{frame}{Con $k$ aristas fijas, ¿dónde ponerlas?}
-  % GUION (0:40) [Persona 2]: ahora fijamos cuántas aristas absorbentes tenemos (k = 63) y
-  % elegimos dónde ponerlas, sin saber dónde parte la partícula (una arista al azar fuera de
-  % T). Barras: extinción eventual exacta (por cargas); puntos: extinción antes de t = 50
-  % (2000 réplicas por configuración, Wilson 95 %). Gana el bloque compacto: 42 % eventual y
-  % 38 % antes de t = 50, contra 10–12 % de las configuraciones aleatorias (árbol aleatorio
-  % truncado en k aristas, y k aristas uniformes).
-  % Código: presentacion/estudio_configuracion.py (mismo motor que el notebook).
-  \centering
-  \includegraphics[height=0.7\textheight]{config_barras.png}\\[1mm]
-  {\footnotesize\color{cafeleche} $k=63$ · caja $9\times9$ · 1 partícula en una arista al azar fuera de $T$ ·
-  2000 réplicas por configuración · $t^\ast=50$ · IC de Wilson al 95\,\%}
-\end{frame}
-
-\begin{frame}{Extinción vs Distribución de Aristas}
-  % GUION (0:40) [Persona 2]: por qué gana el bloque. La partícula en (u,w) se extingue sii u y
-  % w quedan en la misma componente de T. Con k aristas se conectan a lo más n = k+1 vértices,
-  % y entre n vértices de Z^2 caben a lo más ⌊2n − 2√n⌋ aristas (Harary–Harborth, 1976:
-  % isoperimetría de aristas); repartir T en varias componentes nunca ayuda. La cota se alcanza
-  % con cualquier árbol de un bloque casi cuadrado: es lo óptimo para todo k. Los puntos
-  % (antes de t = 50) siguen el mismo orden. Cota: P(τ<∞) ≤ (⌊2n − 2√n⌋ − k)/(|E| − k), n = k+1.
-  \centering
-  \includegraphics[width=0.8\textwidth]{config_curvas.png}\\[1mm]
-  {\footnotesize\color{cafeleche} caja $9\times9$ · 1 partícula en una arista al azar fuera de $T$ ·
-  líneas: exacta por cargas (2000 muestras de $T$ por $k$ en las reglas aleatorias) ·
-  puntos: 2000 réplicas, $t^\ast=50$, IC de Wilson al 95\,\%}
 \end{frame}
 
 \begin{frame}{$T$ creciendo durante la simulación}
@@ -577,6 +514,21 @@
   \videogrande{z2_T_creciente_lazo}{z2_T_creciente_lazo.mp4}
 \end{frame}
 
+\begin{frame}{¿Importa el orden? Kruskal vs árbol revelado}
+  % GUION (0:30) [Persona 2]: dos formas de agregar el árbol. Kruskal: las aristas entran en el
+  % orden en que Kruskal las acepta (lo que usamos). Árbol revelado: se sortea el árbol completo
+  % y sus aristas se revelan en orden uniforme. Mismo árbol final; en cada réplica, misma
+  % condición inicial y mismo árbol con los dos órdenes (pareado). Resultado: el comportamiento
+  % es el mismo (1 partícula: agregar más rápido acelera; lazo: lo retrasa). Para 1 partícula,
+  % Kruskal es algo más rápido: T tiene 2–6 aristas menos al extinguirse, P(τ≤50) hasta
+  % 6 puntos más (0,39 vs 0,33 con m = 10), E[τ] hasta 10 % menor (455 vs 506 con m = 100).
+  % Lazo: sin diferencias significativas. Código: presentacion/comparar_orden.py, §9.4 del notebook.
+  \centering
+  \includegraphics[width=0.9\textwidth]{comparar_orden.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $9\times9$ · árbol revelado: se sortea el árbol y sus aristas entran en orden uniforme ·
+  mismo árbol y misma condición inicial con los dos órdenes · 2000 réplicas por punto · IC al 95\,\%\par}
+\end{frame}
+
 \begin{frame}{En 3D: meseta cuasi-estacionaria hasta la extinción}
   % GUION (0:45) [Persona 2]: en 3D el proceso queda en una meseta cuasi-estacionaria.
   % Corrida honesta (primera semilla, sin elegir): 90 millones de eventos hasta
@@ -585,6 +537,100 @@
   \vspace{9pt}
   \videogrande[0.67]{z3_10particulas_hasta_extincion}{z3_10particulas_hasta_extincion.mp4}\\[1mm]
   {\small $3\times3\times3$, sin selección: \alert{90\,M} eventos hasta la extinción (lazo: 23\,M)}
+\end{frame}
+
+\begin{frame}{Tiempo de extinción con árbol generador: $d=2$}
+  % GUION (0:40) [Persona 2]: T = árbol generador aleatorio que evita la condición inicial, de
+  % modo que la extinción es segura; medimos cuánto tarda. La media crece como potencia del
+  % lado: ≈ L^2,3 para 1 partícula y para N ~ U{1,…,10} partículas (E[τ] = 846 y 1636 en
+  % 25×25), ≈ L^1,2 para el lazo (52 en 25×25). La mediana cuenta otra historia: para 1
+  % partícula se queda en ≈ 20 (cola pesada: la mayoría muere pronto, unas pocas tardan mucho),
+  % y para el lazo es 0,3 en todas las cajas: más de la mitad se autoaniquila al principio.
+  % Motor: el mismo Gillespie del notebook compilado con numba, validado contra el original
+  % (misma distribución de τ, KS). Código: presentacion/tiempos_extincion.py, §9.5 del notebook.
+  \centering
+  \includegraphics[height=0.66\textheight]{tiempos_extincion_2d.png}\\[1mm]
+  {\footnotesize\color{cafeleche} $T$ = árbol generador al azar que evita $\theta_0$ · cajas $L\times L$ ·
+  2000 réplicas por punto · $N$ partículas $+1$ en aristas al azar\par}
+\end{frame}
+
+\begin{frame}{Tiempo de extinción con árbol generador: $d=3$}
+  % GUION (0:40) [Persona 2]: en 3D el tiempo explota con el tamaño: E[τ] ≈ 50–70 en 2×2×2 y
+  % ≈ 7–8·10^5 en 3×3×3 (unos 6·10^7 eventos por réplica), y casi no depende de la condición
+  % inicial: el proceso llega a la meseta y desde ahí la tasa de extinción es la misma. En
+  % 4×4×4 corrimos 100 réplicas por condición con un tope de 10^9 eventos (t ≈ 5·10^6): solo
+  % se extinguieron 8 (1 partícula), 0 (N partículas) y 38 (lazo), TODAS en los primeros 85
+  % eventos: ninguna réplica que llegó a la meseta se extinguió antes del tope. Así que
+  % E[τ] ≥ 3–5·10^6 (flechas: cota inferior, muy conservadora). 5×5×5 queda fuera de alcance.
+  \centering
+  \includegraphics[height=0.66\textheight]{tiempos_extincion_3d.png}\\[1mm]
+  {\footnotesize\color{cafeleche} $T$ = árbol generador al azar que evita $\theta_0$ · $L=2,3$: 1000 réplicas hasta la extinción ·
+  $L=4$: 100 réplicas con tope de $10^9$ eventos\par}
+\end{frame}
+
+\begin{frame}{Extinción vs número de aristas absorbentes}
+  % GUION (0:40) [Persona 2]: la probabilidad de extinción eventual se calcula EXACTA con
+  % las cargas (es conectividad, tipo percolación) y crece con k. El lazo se extingue siempre.
+  \centering
+  \includegraphics[width=\textwidth]{aristas_exacta.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $9\times9$ ($|E|=180$) · 1 partícula en la arista central,
+  5000 muestras por curva · IC de Wilson al 95\,\%}
+\end{frame}
+
+\begin{frame}{¿Más absorción, extinción más rápida? No siempre}
+  % GUION (0:40) [Persona 2]: en tiempo finito NO es monótono: para el lazo, agregar
+  % aristas absorbentes hace más lenta la extinción (1.00 → 0.94). Hipótesis: el árbol
+  % corta el lazo en cadenas abiertas. Condiciones (iguales en todos los puntos): caja 9×9,
+  % 1 partícula en la arista central o lazo ∂f de la cara central; T = las primeras k aristas
+  % de la regla (uniforme: orden aleatorio de todas las aristas; árbol aleatorio: Kruskal, que
+  % termina en un árbol generador en k = 99); 1000 réplicas independientes por punto; t* = 50;
+  % barras = Wilson 95 %; línea discontinua = extinción eventual exacta.
+  \centering
+  \includegraphics[width=0.9\textwidth]{aristas_tiempo_finito.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $9\times9$ · $|E|=180$ aristas · 1000 réplicas por punto}
+\end{frame}
+
+\begin{frame}{En $\mathbb{Z}^3$: el lazo no se acelera}
+  % GUION (0:30) [Persona 2]: mismo experimento en la caja 5×5×5 (|V| = 216, |E| = 540; el
+  % árbol generador tiene 215 aristas). 1 partícula: más absorción, más rápida, pero con el
+  % árbol completo solo 38,5 % se extingue antes de t = 50 aunque la extinción eventual es
+  % segura (el resto escapa a la meseta). Lazo: ≈ 1/3 para todo k ≤ 215 (0,33–0,37, sin
+  % diferencias significativas): ese tercio se autoaniquila en los primeros eventos, donde T no
+  % influye. Solo sube cuando T uniforme cubre casi toda la caja (0,52 con k = 270, 0,90 con
+  % k = 324). La bajada de 2D no aparece en 3D: ninguna curva baja significativamente.
+  % Código: presentacion/no_monotonia_3d.py y §9.3 del notebook.
+  \centering
+  \includegraphics[width=0.9\textwidth]{aristas_tiempo_finito_3d.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $5\times5\times5$ · $|E|=540$ aristas · 1000 réplicas por punto}
+\end{frame}
+
+\begin{frame}{Extinción vs Distribución de Aristas}
+  % GUION (1:00) [Persona 2]: ahora el número de aristas absorbentes k está fijo y elegimos
+  % DÓNDE ponerlas, sin saber dónde parte la partícula: parte en una arista al azar fuera de T.
+  % Por las cargas, la partícula en (u,w) se extingue sii u y w quedan conectados por T.
+  % Dibujos (k = 35): en naranja, las aristas donde, si la partícula parte ahí, se extingue. Un
+  % bloque compacto conecta muchos pares de vecinos (25 de 145 aristas: 17,2 %); repartidas al
+  % azar casi no conectan nada (1,4 %). Gráfico: lo mismo para todo k. Líneas: extinción
+  % eventual exacta (cargas); puntos: antes de t = 50 (simulación). El bloque gana para todo k:
+  % con k aristas se conectan a lo más n = k+1 vértices, y entre n vértices de Z^2 caben a lo
+  % más ⌊2n − 2√n⌋ aristas (Harary–Harborth, 1976); el bloque alcanza esa cota.
+  % Código: presentacion/estudio_configuracion.py y §9.2 del notebook.
+  \vspace{2mm}
+  \begin{columns}[c]
+    \begin{column}{0.25\textwidth}
+      \centering
+      \includegraphics[height=0.55\textheight]{config_dibujos.png}\\[1mm]
+      {\scriptsize\textcolor{verdeosc}{\rule[0.5ex]{4mm}{1.5pt}} $T$ ($k=35$)\\
+      \textcolor{trampa}{\rule[0.5ex]{4mm}{1.5pt}} si parte aquí,\\ se extingue\par}
+    \end{column}
+    \begin{column}{0.73\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{config_curvas.png}
+    \end{column}
+  \end{columns}
+  \vspace{1mm}
+  {\centering\footnotesize\color{cafeleche} caja $9\times9$ · 1 partícula al azar fuera de $T$ ·
+  líneas: exacta · puntos: 2000 réplicas, $t^\ast=50$\par}
 \end{frame}
 
 % =====================================================================

@@ -105,13 +105,10 @@ def figura_cargas():
                 if nombres[i][j]:
                     ax.text(j + 0.485, cy + 0.2, nombres[i][j], ha="center", va="center",
                             fontsize=11.5, color=textos[i][j])
-                ax.text(j + 0.485, cy, f"{100 * n / total:.1f} %".replace(".", ","), ha="center", va="center",
-                        fontsize=22, fontweight="bold", color=textos[i][j])
+                ax.text(j + 0.485, cy, f"{100 * n / total:.2f} %".replace(".", ","), ha="center", va="center",
+                        fontsize=19, fontweight="bold", color=textos[i][j])
                 ax.text(j + 0.485, cy - 0.2, f"{n} réplicas", ha="center", va="center",
                         fontsize=11.5, color=textos[i][j])
-                if cotas[i][j] is not None:
-                    ax.text(j + 0.485, cy - 0.34, f"IC 95 %: < {100 * cotas[i][j]:.2f} %".replace(".", ","),
-                            ha="center", va="center", fontsize=10.5, color=textos[i][j])
         ax.set_xlim(0, 1.97); ax.set_ylim(0, 1.97)
         ax.set_xticks([0.485, 1.485], ["se extinguió", "sigue viva"])
         ax.set_yticks([1.485, 0.485], ["carga\nnula", "carga\nno nula"])

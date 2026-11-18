@@ -299,6 +299,66 @@ def figura_curvas(n_edges, ks, curvas, finitos_k):
         plt.close(fig)
 
 
+K_SIMPLE = 35                  # k de la figura explicativa (bloque 6×6 bien visible)
+
+
+def figura_simple(cx, curvas, finitos_k):
+    """Tres configuraciones con k = K_SIMPLE. Verde: T. Naranja: aristas fuera de T con ambos extremos
+    conectados por T (si la partícula parte en una de ellas, se extingue). Abajo: P(τ < ∞) exacta
+    (promedio sobre T en las reglas aleatorias) y P(τ ≤ t*) simulada."""
+    nombres = EN_FIGURAS
+    seg = nb.edge_segments(cx.edges)
+    tail, head = extremos(cx)
+    with plt.rc_context(ESTILO):
+        fig, axes = plt.subplots(1, len(nombres), figsize=(10.5, 4.6))
+        rng = np.random.default_rng(3)
+        for ax, n in zip(axes, nombres):
+            T = configuraciones(K_SIMPLE)[n](cx, rng)
+            _, lab = nb.components_of(T, cx.d1)
+            trampa = (lab[tail] == lab[head]) & ~T
+            ax.add_collection(LineCollection(seg, colors="#E4D8C6", linewidths=0.8, zorder=1))
+            ax.add_collection(LineCollection(seg[trampa], colors="#E07B39", linewidths=3.0, capstyle="round", zorder=2))
+            ax.add_collection(LineCollection(seg[T], colors="#3E8E3E", linewidths=3.0, capstyle="round", zorder=3))
+            ax.set_xlim(-0.4, BOX[0] + 0.4); ax.set_ylim(-0.4, BOX[1] + 0.4)
+            ax.set_aspect("equal"); ax.axis("off")
+            ax.set_title(n, loc="center", fontsize=15, color=INK, pad=8)
+            p = curvas[n][K_SIMPLE]
+            q = finitos_k[(K_SIMPLE, n)] / R
+            color = "#1E8C66" if n == nombres[0] else INK
+            ax.text(0.5, -0.1, f"{100 * p:.1f} %".replace(".", ","), transform=ax.transAxes, ha="center",
+                    va="top", fontsize=26, fontweight="bold", color=color)
+            ax.text(0.5, -0.3, f"se extingue\n(antes de t = {T_STAR:.0f}: {100 * q:.1f} %)".replace(".", ","),
+                    transform=ax.transAxes, ha="center", va="top", fontsize=12.5, color=INK)
+        fig.legend(handles=[Line2D([], [], color="#3E8E3E", lw=3, label=f"T ({K_SIMPLE} aristas absorbentes)"),
+                            Line2D([], [], color="#E07B39", lw=3, label="si la partícula parte aquí, se extingue")],
+                   loc="upper center", bbox_to_anchor=(0.5, 0.95), ncol=2, fontsize=12.5)
+        fig.savefig(FIGURAS / "config_simple.png", dpi=220, bbox_inches="tight", facecolor="white")
+        plt.close(fig)
+
+
+def figura_dibujos(cx):
+    """Solo los dibujos de figura_simple (k = K_SIMPLE), uno debajo del otro, con el título del color de su curva."""
+    nombres = EN_FIGURAS
+    seg = nb.edge_segments(cx.edges)
+    tail, head = extremos(cx)
+    with plt.rc_context(ESTILO):
+        fig, axes = plt.subplots(len(nombres), 1, figsize=(3.0, 8.4))
+        rng = np.random.default_rng(3)
+        for ax, n in zip(axes, nombres):
+            T = configuraciones(K_SIMPLE)[n](cx, rng)
+            _, lab = nb.components_of(T, cx.d1)
+            trampa = (lab[tail] == lab[head]) & ~T
+            ax.add_collection(LineCollection(seg, colors="#E4D8C6", linewidths=0.8, zorder=1))
+            ax.add_collection(LineCollection(seg[trampa], colors="#E07B39", linewidths=3.0, capstyle="round", zorder=2))
+            ax.add_collection(LineCollection(seg[T], colors="#3E8E3E", linewidths=3.0, capstyle="round", zorder=3))
+            ax.set_xlim(-0.4, BOX[0] + 0.4); ax.set_ylim(-0.4, BOX[1] + 0.4)
+            ax.set_aspect("equal"); ax.axis("off")
+            ax.set_title(n, loc="center", fontsize=15, color=COLORES[n], fontweight="bold", pad=4)
+        fig.subplots_adjust(hspace=0.22)   # la leyenda va en la diapositiva
+        fig.savefig(FIGURAS / "config_dibujos.png", dpi=220, bbox_inches="tight", facecolor="white")
+        plt.close(fig)
+
+
 def main():
     import pickle
     cache = AQUI / "estudio_configuracion_resultados.pkl"
@@ -338,6 +398,10 @@ def terminar(cx, n_edges, nombres, finitos_k, curvas, ks):
 
     figura_barras(cx, exacta, {n: finitos_k[(K_BARRAS, n)] for n in nombres})
     figura_curvas(n_edges, ks, curvas, finitos_k)
+    figura_simple(cx, curvas, finitos_k)
+    figura_dibujos(cx)
+    for n in nombres:
+        print(f"k = {K_SIMPLE}  {n:18s}  P(τ < ∞) = {curvas[n][K_SIMPLE]:.3f}   P(τ ≤ 50) = {finitos_k[(K_SIMPLE, n)] / R:.3f}")
 
 
 if __name__ == "__main__":
