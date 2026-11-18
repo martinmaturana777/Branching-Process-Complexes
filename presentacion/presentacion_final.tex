@@ -9,7 +9,8 @@
 \usepackage{amsmath,amssymb,mathtools}
 \usepackage{booktabs}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta}
+\usetikzlibrary{arrows.meta,decorations.markings}
+\usepackage{appendixnumberbeamer} % el total de diapositivas termina en "¡Gracias!"
 \graphicspath{{figuras/}}
 
 % ---------------------------------------------------------------------
@@ -25,7 +26,8 @@
 % partículas, igual que en los videos
 \definecolor{rojo}{RGB}{214,39,40}
 \definecolor{azul}{RGB}{33,102,194}
-\definecolor{verde}{HTML}{8FD18F}
+\definecolor{verde}{HTML}{8FD18F}       % conjunto absorbente T, igual que en los videos
+\definecolor{verdeosc}{HTML}{3E8E3E}    % arista recién agregada a T
 
 \setbeamercolor{normal text}{fg=cafe, bg=crema}
 \setbeamercolor{background canvas}{bg=crema}
@@ -49,6 +51,36 @@
 \newcommand{\ip}[2]{\langle #1,#2\rangle}
 \newcommand{\repo}{https://github.com/martinmaturana777/Branching-Process-Complexes}
 \newcommand{\video}[2]{\href{\repo/blob/main/videos/#1}{\small\textcolor{dulceosc}{$\blacktriangleright$ #2}}}
+% Video dentro del PDF, a resolución completa, con los cuadros de figuras/anim/#2/ generados por
+% convertir_videos.py, más un enlace al video completo en GitHub. El timeline mantiene el último
+% cuadro 1 s antes de volver a empezar, para que se note la extinción. Se mueve solo en Adobe
+% Acrobat Reader; en otros visores se ve el primer cuadro. Un clic sobre la animación la pausa o la reanuda.
+% [#1] = alto como fracción de \textheight (por defecto 0.75),
+% #2 = carpeta en figuras/anim (nombre del video sin extensión), #3 = archivo .mp4 en GitHub
+\newcommand{\videogrande}[3][0.75]{%
+  \vspace*{-3mm}\centering
+  \input{figuras/anim/#2/param.tex}%
+  \animategraphics[autoplay, loop, height=#1\textheight,
+    timeline=figuras/anim/#2/timeline.txt]{\animfps}{figuras/anim/#2/f-}{001}{\animultimo}\\[1mm]
+  \video{#3}{ver video completo}}
+
+% Un árbol generador de la caja de 5×5 vértices, con sus aristas en el orden en que Kruskal
+% aleatorio las acepta (generado con una semilla fija; mismo algoritmo que el notebook).
+\newcommand{\arbolkruskal}{0/4/1/4, 0/0/1/0, 2/0/2/1, 0/0/0/1, 2/2/2/3, 2/0/3/0, 2/2/3/2, 3/0/3/1,
+  3/4/4/4, 1/4/2/4, 2/4/3/4, 0/2/0/3, 1/3/1/4, 4/2/4/3, 0/3/1/3, 1/0/1/1, 4/3/4/4, 1/2/1/3,
+  2/3/3/3, 3/2/4/2, 4/0/4/1, 4/1/4/2, 3/1/3/2, 1/1/2/1}
+% Grosores iguales a los de las diapositivas del proceso (figuras/proceso/paso_*.png):
+% aristas de T y partículas de 1.5 pt, partícula marcada con un punto de radio 2.1 pt y borde blanco.
+\tikzset{grilla/.style={cafe!30, line width=0.35pt},
+         aristaT/.style={line width=1.5pt, line cap=round},
+         particula/.style={line width=1.5pt, line cap=round}}
+\newcommand{\punto}[2]{\filldraw[#1, draw=white, line width=0.5pt] #2 circle (2.1pt)}
+% \dibujarT{k}: grilla de 5×5 vértices con las primeras k aristas del árbol (la k-ésima, más oscura)
+\newcommand{\dibujarT}[1]{%
+  \foreach \i in {0,...,4} {\draw[grilla] (\i,0) -- (\i,4); \draw[grilla] (0,\i) -- (4,\i);}
+  \foreach \xa/\ya/\xb/\yb [count=\n] in \arbolkruskal {%
+    \ifnum\n<#1 \draw[verde, aristaT] (\xa,\ya) -- (\xb,\yb);\fi
+    \ifnum\n=#1 \draw[verdeosc, aristaT] (\xa,\ya) -- (\xb,\yb);\fi}}
 
 \title{Procesos de ramificación en complejos celulares}
 \subtitle{Simulación, extinción y conjuntos absorbentes}
@@ -147,6 +179,64 @@
   \uncover<3->{misma regla, una dimensión más arriba: \alert{se resta el borde}}
 \end{frame}
 
+\begin{frame}{Operador de borde y convención de signos}
+  % GUION (0:40): fijamos orientaciones: una arista es positiva hacia la derecha o hacia arriba;
+  % una cara es positiva en sentido antihorario (heredado de R^2). El borde de una arista es
+  % cabeza menos cola. El borde de una cara es su recorrido antihorario: abajo y derecha entran
+  % con +, arriba e izquierda con - (porque se recorren contra su orientación positiva).
+  % Una partícula + (rojo) es theta_e > 0; una - (azul) es theta_e < 0. Además ∂∂ = 0:
+  % cada vértice de una cara es cabeza de una arista y cola de la siguiente; esto dará las
+  % cargas conservadas más adelante.
+  % Fórmula general (no se muestra): ∂x = sum_{i in J_x} eps_{J_x}(i) [x + e_i/2 - (x - e_i/2)].
+  \centering
+  \begin{tikzpicture}[lab/.style={font=\footnotesize},
+      mid/.style={postaction={decorate}, decoration={markings,
+        mark=at position 0.62 with {\arrow{Stealth[length=2.3mm]}}}}]
+    % --- (a) convención en la grilla ---
+    \begin{scope}[scale=1.15]
+      \fill[leche] (0.06,0.06) rectangle (0.94,0.94);
+      \fill[leche] (1.06,0.06) rectangle (1.94,0.94);
+      \fill[leche] (0.06,1.06) rectangle (0.94,1.94);
+      \fill[leche] (1.06,1.06) rectangle (1.94,1.94);
+      \foreach \y in {0,1,2} \foreach \x in {0,1}
+        \draw[cafe, thick, mid] (\x,\y) -- (\x+1,\y);
+      \foreach \x in {0,1,2} \foreach \y in {0,1}
+        \draw[cafe, thick, mid] (\x,\y) -- (\x,\y+1);
+      \foreach \x in {0.5,1.5} \foreach \y in {0.5,1.5}
+        \node[dulceosc, font=\normalsize] at (\x,\y) {$\circlearrowleft$};
+      \node[lab, align=center] at (1,-0.55) {aristas $+$: $\rightarrow$ y $\uparrow$\\ caras $+$: $\circlearrowleft$};
+    \end{scope}
+    % --- (b) borde de una arista ---
+    \begin{scope}[xshift=4.0cm, yshift=0.55cm, scale=1.15]
+      \draw[cafe, very thick, mid] (0,0.6) -- (1.4,0.6);
+      \node[lab] at (0.7,0.88) {$e$};
+      \node[circle, fill=azul, inner sep=0pt, minimum size=7pt] at (0,0.6) {};
+      \node[circle, fill=rojo, inner sep=0pt, minimum size=7pt] at (1.4,0.6) {};
+      \node[lab, azul] at (0,0.25) {$-$}; \node[lab, rojo] at (1.4,0.25) {$+$};
+      \node[lab] at (0.7,-0.6) {$\partial e=\text{cabeza}-\text{cola}$};
+    \end{scope}
+    % --- (c) borde de una cara ---
+    \begin{scope}[xshift=7.6cm, scale=1.6]
+      \fill[leche] (0,0) rectangle (1,1);
+      \draw[rojo, line width=1.6pt, mid] (0,0) -- (1,0);
+      \draw[rojo, line width=1.6pt, mid] (1,0) -- (1,1);
+      \draw[azul, line width=1.6pt, mid] (0,1) -- (1,1);
+      \draw[azul, line width=1.6pt, mid] (0,0) -- (0,1);
+      \node[lab, rojo] at (0.5,-0.17) {$+$};
+      \node[lab, rojo] at (1.15,0.5) {$+$};
+      \node[lab, azul] at (0.5,1.17) {$-$};
+      \node[lab, azul] at (-0.15,0.5) {$-$};
+      \node[dulceosc, font=\Large] at (0.5,0.5) {$\circlearrowleft$};
+      \node[lab] at (0.5,-0.55) {$\partial f=\text{abajo}+\text{der}-\text{arriba}-\text{izq}$};
+    \end{scope}
+  \end{tikzpicture}
+  \vspace{5mm}
+
+  $\theta_e>0$: \textcolor{rojo}{partícula $+$} \qquad
+  $\theta_e<0$: \textcolor{azul}{partícula $-$} \qquad
+  \alert{$\partial\partial=0$}
+\end{frame}
+
 \begin{frame}{De los grafos a las Celdas}
   % GUION (0:20): en notación: las partículas viven en aristas y tienen carga
   % (+ rojo, - azul). Las que interactúan son las caras (cuadraditos).
@@ -206,37 +296,86 @@
   \includegraphics[height=0.84\textheight]{proceso/paso_06}
 \end{frame}
 
+\begin{frame}{Lo que prueba el paper}
+  % GUION (0:45): el resultado de Cid y Sepúlveda (§2.3–2.4 del borrador). Las partículas que
+  % llegan a T mueren. Si T es un árbol generador, es decir, toca todos los vértices sin cerrar
+  % lazos (ciclos):
+  %  - Poincaré (Lema 2.3): una configuración que no se ve desde las caras (∇θ = 0) es un
+  %    gradiente ∇g; como T toca todos los vértices, g = 0 y θ = 0. Entonces ‖∇θ‖² ≥ c'‖θ‖².
+  %  - Lyapunov (Teorema 2.4): L‖θ‖² ≤ c‖θ‖ − c'‖θ‖², una deriva geométrica (Foster–Lyapunov).
+  %  - Por eso (Observación 3) el proceso se extingue casi seguramente, con colas exponenciales.
+  % El paper NO dice cuánto tarda ni qué pasa si T no es generador. Ejemplo: el lazo ∂f (las 4
+  % aristas de una cara) se extingue incluso sin aristas absorbentes, porque su divergencia es
+  % nula (lo vemos en el video y en las cargas conservadas). Eso es lo que estudiamos con simulación.
+  \begin{columns}[c]
+    \begin{column}{0.34\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=0.82]
+        \dibujarT{25}
+        \draw[rojo, particula] (0,1) -- (0,2); \punto{rojo}{(0,1.5)};
+        \draw[azul, particula] (2,1) -- (3,1); \punto{azul}{(2.5,1)};
+        \draw[rojo, particula] (3,3) -- (3,4); \punto{rojo}{(3,3.5)};
+      \end{tikzpicture}\\[1mm]
+      {\small \textcolor{verdeosc}{$T$}: árbol generador}
+    \end{column}
+    \begin{column}{0.64\textwidth}
+      \begin{block}{Si $T$ es un árbol generador}
+        \begin{tabular}{@{}ll@{}}
+          {\small Poincaré} & $\|\nabla\theta\|_2^2\ge c'(T)\,\|\theta\|_2^2$\\[1.5mm]
+          {\small Lyapunov} & $\mathcal{L}\|\theta\|_2^2\le c\,\|\theta\|_2-c'\,\|\theta\|_2^2$\\[1.5mm]
+        \end{tabular}\\[1.5mm]
+        $\Longrightarrow$ \alert{extinción casi segura}, con colas exponenciales
+      \end{block}
+      \vspace{3mm}
+      {\small\color{cafeleche} no dice cuánto tarda, ni qué pasa si $T$ no es generador:\\
+      el lazo $\partial f$, por ejemplo, se extingue incluso con $T=\emptyset$}
+    \end{column}
+  \end{columns}
+\end{frame}
+
 \begin{frame}{¿Por qué estudiarlo?}
   % GUION (0:45): convencer. Cada clic hace aparecer un cuadro.
   %  [1] Es la generalización natural de dimensión alta de los procesos de ramificación y paseos
   %      aleatorios: en vez de vértices, aristas y caras; la geometría la da el Laplaciano de Hodge.
   %  [2] Compiten dos fuerzas: la ramificación (1→3) empuja a crecer, la aniquilación y la
   %      absorción a morir. ¿Quién gana? Es la pregunta clásica de la extinción.
-  %  [3] El paper prueba que con un árbol generador se extingue, pero no dice cuándo ni qué
-  %      pasa con otros conjuntos absorbentes: ahí entra la simulación.
+  %  [3] Nuestro objetivo son dos preguntas. Primera: ¿bajo qué condiciones se extingue? El
+  %      paper prueba que con un árbol generador se extingue, pero no qué pasa con otros
+  %      conjuntos absorbentes.
+  %  [4] Segunda: ¿cuánto tarda en extinguirse? El paper no da el tiempo: ahí entra la simulación.
   \begin{columns}[T]
-    \begin{column}{0.31\textwidth}
+    \begin{column}{0.4\textwidth}
       \uncover<1->{%
       \begin{block}{Generalización Natural}
         \centering Paseo aleatorio \\
         en dimensión alta
       \end{block}}
     \end{column}
-    \begin{column}{0.31\textwidth}
+    \begin{column}{0.4\textwidth}
       \uncover<2->{%
       \begin{block}{Dos fuerzas}
         \centering ramificación $1\to3$\\ vs.\ aniquilación
       \end{block}}
     \end{column}
-    \begin{column}{0.31\textwidth}
+  \end{columns}
+  \vspace{4mm}
+
+  \uncover<3->{\centering{\large\bfseries\color{dulceosc} Nuestro objetivo}\par}
+  \vspace{2mm}
+  \begin{columns}[T]
+    \begin{column}{0.4\textwidth}
       \uncover<3->{%
-      \begin{alertblock}{Nuestro objetivo}
-        \centering ¿cuándo y cuánto\\ tarda la extinción?
+      \begin{alertblock}{Pregunta 1}
+        \centering ¿Bajo qué condiciones\\ se extingue el proceso?
+      \end{alertblock}}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \uncover<4->{%
+      \begin{alertblock}{Pregunta 2}
+        \centering ¿Cuánto tarda\\ en extinguirse?
       \end{alertblock}}
     \end{column}
   \end{columns}
-  \vspace{5mm}
-
 \end{frame}
 
 \begin{frame}{Nuestro enfoque: simulación exacta}
@@ -274,28 +413,34 @@
 \metroset{sectionpage=progressbar}
 \section{Resultados}
 
-\begin{frame}{La dinámica}
-  % GUION (0:30) [Persona 1]: mostrar el video 2D (10 partículas + árbol verde). En el
-  % del lazo las partículas son el borde de una región (θ = θ0 + ∂η).
-  \begin{columns}[c]
-    \begin{column}{0.5\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{vid_z2_10particulas.png}\\
-      \video{z2_10particulas_arbol.mp4}{ver video}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{vid_z2_lazo_sin_arbol.png}\\
-      \video{z2_lazo_sin_arbol.mp4}{ver video}
-    \end{column}
-  \end{columns}
+\begin{frame}{10 partículas absorbidas por un árbol generador}
+  % GUION (0:15) [Persona 1]: Z^2 7x7, 10 partículas y el árbol generador (verde) absorbente.
+  % Arriba: el número de partículas sube por la ramificación y baja por aniquilación y
+  % absorción. Abajo: aniquilaciones y absorciones acumuladas. Termina extinguiéndose: el
+  % último cuadro (0 partículas) se mantiene 1 s antes de volver a empezar.
+  \vspace{9pt}
+  \videogrande{z2_10particulas_arbol}{z2_10particulas_arbol.mp4}
+\end{frame}
+
+\begin{frame}{Un lazo se extingue incluso sin absorción}
+  % GUION (0:15) [Persona 1]: sin árbol, partiendo del lazo ∂f. Las partículas son siempre
+  % el borde de una región (θ = θ0 + ∂η, la región sombreada): cuando esa región se
+  % reduce a nada, el proceso se extingue solo por aniquilación.
+  \vspace{9pt}
+  \videogrande{z2_lazo_sin_arbol}{z2_lazo_sin_arbol.mp4}
 \end{frame}
 
 \begin{frame}{Cargas conservadas}
   % GUION (1:00) [Persona 1]: resultado principal. Para cada componente del grafo de
   % aristas absorbentes, el flujo neto se conserva. Si alguno es distinto de cero, no
   % puede extinguirse. Una partícula se extingue sii sus extremos quedan conectados por T.
-  % Verificado: 2400 simulaciones, 0 errores.
+  % Gráfico: en cada réplica se sortea T = k aristas al azar, se calculan las cargas (¿todas
+  % nulas?) y se simula el proceso. Matriz 2×2 sumada sobre k = 0, 20, ..., 140 (8000 réplicas,
+  % semilla nueva, independiente del notebook): 52,2 % carga nula y se extinguió (4174), 47,8 %
+  % carga no nula y sigue viva (3826). Error tipo I (carga nula pero no se extinguió) y tipo II
+  % (carga no nula pero se extinguió): 0 réplicas cada uno; cota de Wilson al 95 %: < 0,1 %.
+  % Margen: la extinción más lenta con carga nula tomó 2095 eventos, de un tope de 10 millones.
+  % Código: presentacion/graficos_diapositivas.py.
   \begin{columns}[c]
     \begin{column}{0.38\textwidth}
       \centering
@@ -307,67 +452,139 @@
     \end{column}
     \begin{column}{0.6\textwidth}
       \centering
-      \includegraphics[width=\linewidth]{verificacion_cargas.png}
+      \includegraphics[height=0.6\textheight]{verificacion_cargas.png}
     \end{column}
   \end{columns}
+  \vspace{4mm}
+  {\centering\footnotesize\color{cafeleche} caja $9\times9$ · 1 partícula en la arista central · $T$ = $k$ aristas al azar, $k=0,20,\dots,140$ ·
+  1000 réplicas por $k$ (8000 en total) · hasta $10^7$ eventos (carga nula) o $10^5$ (no nula) ·
+  la extinción más lenta tomó 2095\par}
 \end{frame}
 
 \begin{frame}{Extinción vs número de aristas absorbentes}
   % GUION (0:40) [Persona 2]: la probabilidad de extinción eventual se calcula EXACTA con
   % las cargas (es conectividad, tipo percolación) y crece con k. El lazo se extingue siempre.
   \centering
-  \includegraphics[width=\textwidth]{aristas_exacta.png}
+  \includegraphics[width=\textwidth]{aristas_exacta.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $9\times9$ ($|E|=180$) · 1 partícula en la arista central,
+  5000 muestras por curva · IC de Wilson al 95\,\%}
 \end{frame}
 
 \begin{frame}{¿Más absorción, extinción más rápida? No siempre}
   % GUION (0:40) [Persona 2]: en tiempo finito NO es monótono: para el lazo, agregar
   % aristas absorbentes hace más lenta la extinción (1.00 → 0.94). Hipótesis: el árbol
-  % corta el lazo en cadenas abiertas.
+  % corta el lazo en cadenas abiertas. Condiciones (iguales en todos los puntos): caja 9×9,
+  % 1 partícula en la arista central o lazo ∂f de la cara central; T = las primeras k aristas
+  % de la regla (uniforme: orden aleatorio de todas las aristas; árbol aleatorio: Kruskal, que
+  % termina en un árbol generador en k = 99); 1000 réplicas independientes por punto; t* = 50;
+  % barras = Wilson 95 %; línea discontinua = extinción eventual exacta.
   \centering
-  \includegraphics[width=0.9\textwidth]{aristas_tiempo_finito.png}
+  \includegraphics[width=0.9\textwidth]{aristas_tiempo_finito.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $9\times9$ · $|E|=180$ aristas · 1000 réplicas por punto}
+\end{frame}
+
+\begin{frame}{En $\mathbb{Z}^3$: el lazo no se acelera}
+  % GUION (0:30) [Persona 2]: mismo experimento en la caja 5×5×5 (|V| = 216, |E| = 540; el
+  % árbol generador tiene 215 aristas). 1 partícula: más absorción, más rápida, pero con el
+  % árbol completo solo 38,5 % se extingue antes de t = 50 aunque la extinción eventual es
+  % segura (el resto escapa a la meseta). Lazo: ≈ 1/3 para todo k ≤ 215 (0,33–0,37, sin
+  % diferencias significativas): ese tercio se autoaniquila en los primeros eventos, donde T no
+  % influye. Solo sube cuando T uniforme cubre casi toda la caja (0,52 con k = 270, 0,90 con
+  % k = 324). La bajada de 2D no aparece en 3D: ninguna curva baja significativamente.
+  % Código: presentacion/no_monotonia_3d.py y §9.3 del notebook.
+  \centering
+  \includegraphics[width=0.9\textwidth]{aristas_tiempo_finito_3d.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $5\times5\times5$ · $|E|=540$ aristas · 1000 réplicas por punto}
+\end{frame}
+
+\begin{frame}{Con $k$ aristas fijas, ¿dónde ponerlas?}
+  % GUION (0:40) [Persona 2]: ahora fijamos cuántas aristas absorbentes tenemos (k = 63) y
+  % elegimos dónde ponerlas, sin saber dónde parte la partícula (una arista al azar fuera de
+  % T). Barras: extinción eventual exacta (por cargas); puntos: extinción antes de t = 50
+  % (2000 réplicas por configuración, Wilson 95 %). Gana el bloque compacto: 42 % eventual y
+  % 38 % antes de t = 50, contra 10–12 % de las configuraciones aleatorias (árbol aleatorio
+  % truncado en k aristas, y k aristas uniformes).
+  % Código: presentacion/estudio_configuracion.py (mismo motor que el notebook).
+  \centering
+  \includegraphics[height=0.7\textheight]{config_barras.png}\\[1mm]
+  {\footnotesize\color{cafeleche} $k=63$ · caja $9\times9$ · 1 partícula en una arista al azar fuera de $T$ ·
+  2000 réplicas por configuración · $t^\ast=50$ · IC de Wilson al 95\,\%}
+\end{frame}
+
+\begin{frame}{Extinción vs Distribución de Aristas}
+  % GUION (0:40) [Persona 2]: por qué gana el bloque. La partícula en (u,w) se extingue sii u y
+  % w quedan en la misma componente de T. Con k aristas se conectan a lo más n = k+1 vértices,
+  % y entre n vértices de Z^2 caben a lo más ⌊2n − 2√n⌋ aristas (Harary–Harborth, 1976:
+  % isoperimetría de aristas); repartir T en varias componentes nunca ayuda. La cota se alcanza
+  % con cualquier árbol de un bloque casi cuadrado: es lo óptimo para todo k. Los puntos
+  % (antes de t = 50) siguen el mismo orden. Cota: P(τ<∞) ≤ (⌊2n − 2√n⌋ − k)/(|E| − k), n = k+1.
+  \centering
+  \includegraphics[width=0.8\textwidth]{config_curvas.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $9\times9$ · 1 partícula en una arista al azar fuera de $T$ ·
+  líneas: exacta por cargas (2000 muestras de $T$ por $k$ en las reglas aleatorias) ·
+  puntos: 2000 réplicas, $t^\ast=50$, IC de Wilson al 95\,\%}
 \end{frame}
 
 \begin{frame}{$T$ creciendo durante la simulación}
-  % GUION (0:30) [Persona 2]: una arista nueva cada m eventos. Una partícula: muere apenas
-  % sus extremos se conectan (59/99 aristas). Lazo: el árbol se completa y el lazo,
-  % ya cortado, sobrevive ~100 eventos más.
-  \begin{columns}[c]
-    \begin{column}{0.5\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{vid_T_creciente_1particula.png}\\
-      \video{z2_T_creciente_1particula.mp4}{ver video}
+  % GUION (0:30) [Persona 2]: nuestro enfoque. Al inicio de cada réplica se sortea un orden
+  % aleatorio de las aristas (Kruskal): se recorren al azar y se acepta cada una que no cierra
+  % un ciclo. Al final queda un árbol generador fijo de esa réplica. T parte vacío y, cada m
+  % eventos, se agrega la siguiente arista de ese orden; la partícula que esté encima muere en
+  % ese momento. T es siempre un bosque y en k = |V|-1 es el árbol completo; desde ahí la
+  % extinción es segura. Nota: el orden de Kruskal no es exactamente uniforme entre las aristas
+  % del árbol (las aristas centrales tienden a entrar antes), pero es aleatorio y no mira θ.
+  \centering
+  \begin{tikzpicture}[scale=0.58, paso/.style={-{Stealth[length=2.6mm]}, cafe, thick},
+      lab/.style={font=\small, cafeleche}]
+    \begin{scope}              \dibujarT{5}  \end{scope}
+    \begin{scope}[xshift=8cm]  \dibujarT{14} \end{scope}
+    \begin{scope}[xshift=16cm] \dibujarT{24} \end{scope}
+    \draw[paso] (4.8,2) -- (7.2,2) node[midway, above=2pt, lab] {$m$ eventos};
+    \draw[paso] (12.8,2) -- (15.2,2) node[midway, above=2pt, lab] {$m$ eventos};
+    \node[lab] at (2,-0.8) {$k=5$};
+    \node[lab] at (10,-0.8) {$k=14$};
+    \node[lab] at (18,-0.8) {$k=24$: árbol generador};
+  \end{tikzpicture}
+  \vspace{5mm}
+
+  \begin{columns}[T]
+    \begin{column}{0.47\textwidth}
+      \begin{block}{Orden fijo al inicio}
+        \centering aristas al azar, sin cerrar ciclos\\ (Kruskal aleatorio)
+      \end{block}
     \end{column}
-    \begin{column}{0.5\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{vid_T_creciente_lazo.png}\\
-      \video{z2_T_creciente_lazo.mp4}{ver video}
+    \begin{column}{0.47\textwidth}
+      \begin{block}{Una arista cada $m$ eventos}
+        \centering la partícula encima muere;\\ $T$ es siempre un bosque
+      \end{block}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{En 3D: la meseta}
+\begin{frame}{$T$ creciente: una partícula muere antes de completar el árbol}
+  % GUION (0:15) [Persona 2]: Z^2 9x9, se agrega una arista absorbente cada 10 eventos.
+  % La partícula (y sus descendientes) mueren apenas sus extremos quedan conectados por T:
+  % con 58/99 aristas, sin necesidad del árbol completo.
+  \vspace{9pt}
+  \videogrande{z2_T_creciente_1particula}{z2_T_creciente_1particula.mp4}
+\end{frame}
+
+\begin{frame}{$T$ creciente: el lazo sobrevive al árbol completo}
+  % GUION (0:15) [Persona 2]: ahora el lazo ∂f y una arista nueva en cada evento. El árbol
+  % se completa (99/99) cerca del evento 100, pero el lazo, ya cortado en cadenas, sobrevive
+  % ~100 eventos más: más absorción no siempre acelera la extinción.
+  \vspace{9pt}
+  \videogrande{z2_T_creciente_lazo}{z2_T_creciente_lazo.mp4}
+\end{frame}
+
+\begin{frame}{En 3D: meseta cuasi-estacionaria hasta la extinción}
   % GUION (0:45) [Persona 2]: en 3D el proceso queda en una meseta cuasi-estacionaria.
   % Corrida honesta (primera semilla, sin elegir): 90 millones de eventos hasta
-  % extinguirse. Desde la meseta el tiempo de extinción es ~exponencial; la caída final
-  % es brusca.
-  \begin{columns}[c]
-    \begin{column}{0.6\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{vid_z3_10particulas_extincion.png}\\
-      \video{z3_10particulas_hasta_extincion.mp4}{ver video}
-    \end{column}
-    \begin{column}{0.38\textwidth}
-      \centering
-      $3\times3\times3$, sin selección\\[2mm]
-      \begin{tabular}{@{}lr@{}}
-        \toprule
-        lazo & 23\,M \\
-        10 partículas & \alert{90\,M} \\
-        \bottomrule
-      \end{tabular}\\[1mm]
-      {\small eventos hasta la extinción}
-    \end{column}
-  \end{columns}
+  % extinguirse (el lazo: 23 millones). Desde la meseta el tiempo de extinción es
+  % ~exponencial; la caída final es brusca.
+  \vspace{9pt}
+  \videogrande[0.67]{z3_10particulas_hasta_extincion}{z3_10particulas_hasta_extincion.mp4}\\[1mm]
+  {\small $3\times3\times3$, sin selección: \alert{90\,M} eventos hasta la extinción (lazo: 23\,M)}
 \end{frame}
 
 % =====================================================================
@@ -379,11 +596,13 @@
 \begin{frame}{Conclusiones}
   % GUION (0:40): simulador exacto y verificado; las cargas conservadas deciden si hay
   % extinción (y la vuelven un problema de conectividad); la velocidad no es monótona;
-  % en 3D aparece una meseta y la extinción tarda decenas de millones de eventos.
+  % con k aristas fijas lo mejor es un bloque compacto; en 3D aparece una meseta y la
+  % extinción tarda decenas de millones de eventos.
   \begin{enumerate}
     \item simulador \alert{exacto}, verificado contra la teoría
     \item \alert{cargas conservadas} deciden si hay extinción
     \item la \emph{velocidad} de extinción no es monótona en $T$
+    \item con $k$ aristas fijas: \alert{bloque compacto}
     \item en 3D: meseta cuasi-estacionaria
   \end{enumerate}
 \end{frame}
@@ -391,40 +610,25 @@
 \begin{frame}{Pasos futuros}
   % GUION (0:50):
   %  - Demostrar la hipótesis de accesibilidad (la única pieza no probada del teorema).
-  %  - Conjetura: la tasa de extinción con árbol fijo es la constante de Poincaré,
-  %    γ(T) ≈ c'(T) (correlación 0.95 en 40 árboles): probarla o refutarla.
   %  - Explicar la no monotonía (¿el árbol "corta" los lazos?).
-  %  - Árbol generador uniforme (algoritmo de Wilson) y Fleming-Viot para estudiar la
-  %    meseta en 3D sin esperar la extinción.
+  %  - Árbol generador uniforme (algoritmo de Wilson).
   \begin{itemize}
     \item demostrar la \alert{accesibilidad}
-    \item conjetura: $\gamma(T)\approx c'(T)$ \quad (tasa $=$ Poincaré)
     \item explicar la no monotonía
-    \item árbol uniforme (Wilson) y Fleming--Viot en 3D
+    \item árbol uniforme (Wilson)
   \end{itemize}
 \end{frame}
-
-% \begin{frame}{Stochastic Ninja Warrior}
-%   % GUION (0:30): cierre. ¿Y si el conjunto absorbente se mueve? Cruz que gira y anillo
-%   % que oscila; 8 concursantes; cada × es una eliminación. Nadie llega a GAME OVER:
-%   % ramificación y eliminaciones se equilibran.
-%   \begin{columns}[c]
-%     \begin{column}{0.5\textwidth}
-%       \centering
-%       \includegraphics[width=\linewidth]{ninja_cruz.png}\\
-%       \video{ninja_cruz.mp4}{ver video}
-%     \end{column}
-%     \begin{column}{0.5\textwidth}
-%       \centering
-%       \includegraphics[width=\linewidth]{ninja_anillo.png}\\
-%       \video{ninja_anillo.mp4}{ver video}
-%     \end{column}
-%   \end{columns}
-% \end{frame}
 
 \begin{frame}[standout]
   % GUION: ¡Gracias! Los videos de Stochastic Ninja Warrior corren solos en bucle
   % (necesita Adobe Acrobat Reader; en otros visores se ve el primer cuadro).
+  % metropolis no enumera las standout: se suma a mano para que esta sea la última enumerada
+  \stepcounter{framenumber}%
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=south east, text=crema, font=\usebeamerfont{page number in head/foot}]
+      at ([xshift=-0.45cm, yshift=0.3cm]current page.south east)
+      {\insertframenumber/\inserttotalframenumber};
+  \end{tikzpicture}%
   ¡Gracias!\\[3mm]
   \animategraphics[autoplay, loop, width=0.31\textwidth]{10}{figuras/ninja_cruz_anim}{}{}\hspace{6mm}%
   \animategraphics[autoplay, loop, width=0.31\textwidth]{10}{figuras/ninja_anillo_anim}{}{}\\[4mm]
@@ -436,6 +640,7 @@
 %  RESPALDO (no se presenta; solo para preguntas)
 % =====================================================================
 \appendix
+\metroset{numbering=none} % el respaldo no se enumera
 
 \begin{frame}{Respaldo: precisión de las estimaciones}
   % GUION: proporción de réplicas, insesgada; cortar en t* no sesga; Wilson funciona
