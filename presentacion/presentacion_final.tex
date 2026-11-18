@@ -87,152 +87,69 @@
 \metroset{sectionpage=none}
 \section{El proyecto}
 
-\begin{frame}{Celdas como puntos de $\tfrac12\Z^d$}
-  % GUION (0:30): cada celda del complejo se identifica con su centro. Un vértice tiene todas
-  % sus coordenadas enteras; el punto medio de una arista tiene una coordenada fraccionaria; el
-  % centro de una cara, dos; el de un cubo, tres. Así las k-celdas son simplemente puntos de
-  % (1/2)Z^d con k coordenadas en Z+1/2. El borde también es fácil: se mueve +-1/2 en cada
-  % coordenada fraccionaria, con un signo que fija la orientación (en 2D, antihoraria).
-  % En el código usamos z = 2x: todo son vectores de enteros y una k-celda tiene k coordenadas impares.
+\begin{frame}{Un paseo aleatorio, una dimensión más arriba}
+  % GUION (0:45): la idea en una frase: es un paseo aleatorio, pero con objetos de una
+  % dimensión más.
+  %  [1] En un paseo aleatorio la partícula vive en un vértice. Cuando suena su reloj elige
+  %      una arista vecina, la cruza y aparece en el otro extremo: el borde de la arista son
+  %      dos vértices, el de donde sale y el de llegada. Una partícula da una partícula.
+  %  [2] Aquí la partícula vive en una arista. Cuando suena elige una cara vecina, la "cruza"
+  %      y aparece en el resto del borde de la cara. Pero el borde de un cuadrado tiene cuatro
+  %      aristas: de una partícula salen tres. Eso es la ramificación. El color es la carga
+  %      (rojo +, azul -), que viene de la orientación del borde; si una + y una - caen en la
+  %      misma arista, se aniquilan.
+  %  [3] Es la misma regla, restar el borde, una dimensión más arriba. Y como el paseo
+  %      aleatorio, en promedio sigue una ecuación del calor: la del Laplaciano del grafo en un
+  %      caso y la del Laplaciano de Hodge en el otro.
   \centering
-  $k$-celda $\;\longleftrightarrow\;$ punto $x\in\big(\tfrac12\Z\big)^d$ con \alert{$k$ coordenadas en $\Z+\tfrac12$}
-  \vspace{2mm}
+  \begin{tikzpicture}[scale=1.1,
+      ctx/.style={cafe!25, thick},
+      sel/.style={dulce, line width=2.2pt},
+      paso/.style={-{Stealth[length=3mm]}, cafe, thick},
+      lab/.style={font=\small, cafeleche}]
+    % ------------------------------------------------ fila 1: paseo aleatorio
+    \uncover<1->{
+      \node[anchor=east, align=right] at (-0.6,0) {\textbf{paseo aleatorio}\\[-0.5mm] {\small vive en vértices}};
+      \foreach \dx in {0, 4.6} {
+        \begin{scope}[xshift=\dx cm]
+          \draw[ctx] (-0.45,0) -- (1.85,0) (0,-0.45) -- (0,0.45) (1.4,-0.45) -- (1.4,0.45);
+          \draw[sel] (0,0) -- (1.4,0);
+          \fill[cafe] (0,0) circle (1.6pt) (1.4,0) circle (1.6pt);
+        \end{scope}}
+      \fill[rojo] (0,0) circle (4pt);
+      \fill[rojo] (6.0,0) circle (4pt);
+      \draw[paso] (2.2,0) -- (4.0,0) node[midway, above=3pt, lab] {cruza una arista};
+      \node at (8.1,0) {\Large $1\to1$};
+    }
+    % ------------------------------------------------ fila 2: una dimensión más
+    \uncover<2->{
+      \node[anchor=east, align=right] at (-0.6,-2.6) {\textbf{nuestro proceso}\\[-0.5mm] {\small vive en aristas}};
+      \foreach \dx in {0, 4.6} {
+        \begin{scope}[xshift=\dx cm, yshift=-3.3cm]
+          \fill[leche] (0,0) rectangle (1.4,1.4);
+          \draw[ctx] (-0.45,0) -- (1.85,0) (-0.45,1.4) -- (1.85,1.4) (0,-0.45) -- (0,1.85) (1.4,-0.45) -- (1.4,1.85);
+          \draw[dulce, thick] (0,0) rectangle (1.4,1.4);
+        \end{scope}}
+      % antes: una partícula + en la arista de abajo
+      \draw[rojo, line width=2.6pt] (0,-3.3) -- (1.4,-3.3); \fill[rojo] (0.7,-3.3) circle (3pt);
+      % después: el resto del borde de la cara
+      \begin{scope}[xshift=4.6cm, yshift=-3.3cm]
+        \draw[azul, line width=2.6pt] (1.4,0) -- (1.4,1.4); \fill[azul] (1.4,0.7) circle (3pt);
+        \draw[rojo, line width=2.6pt] (0,1.4) -- (1.4,1.4); \fill[rojo] (0.7,1.4) circle (3pt);
+        \draw[rojo, line width=2.6pt] (0,0) -- (0,1.4);     \fill[rojo] (0,0.7) circle (3pt);
+      \end{scope}
+      \draw[paso] (2.2,-2.6) -- (4.0,-2.6) node[midway, above=3pt, lab] {cruza una cara};
+      \node at (8.1,-2.6) {\Large \alert{$1\to3$}};
+    }
+  \end{tikzpicture}
+  \vspace{4mm}
 
-      \centering
-      \begin{tikzpicture}[scale=2.7,
-          vert/.style={circle, fill=cafe, inner sep=0pt, minimum size=6pt},
-          edge/.style={circle, fill=dulceosc, inner sep=0pt, minimum size=5pt},
-          face/.style={rectangle, fill=caramelo, draw=dulceosc, inner sep=0pt, minimum size=7pt},
-          lab/.style={font=\footnotesize}]
-        \fill[leche] (0,0) rectangle (1,1);
-        \draw[cafe!60, thick] (0,0) rectangle (1,1);
-        % orientación antihoraria del borde de la cara
-        \foreach \a/\b in {{(0.62,0)/(0.84,0)}, {(1,0.62)/(1,0.84)}, {(0.38,1)/(0.16,1)}, {(0,0.38)/(0,0.16)}}
-          \draw[dulce, very thick, -{Stealth[length=2.6mm]}] \a -- \b;
-        % 0-celdas: ninguna coordenada fraccionaria
-        \node[vert, label={[lab]below left:$(0,0)$}]  at (0,0) {};
-        \node[vert, label={[lab]below right:$(1,0)$}] at (1,0) {};
-        \node[vert, label={[lab]above right:$(1,1)$}] at (1,1) {};
-        \node[vert, label={[lab]above left:$(0,1)$}]  at (0,1) {};
-        % 1-celdas: una coordenada fraccionaria (con su signo en el borde de la cara)
-        \node[edge, label={[lab, dulceosc]below:$+(\tfrac12,0)$}] at (0.5,0) {};
-        \node[edge, label={[lab, dulceosc]right:$+(1,\tfrac12)$}] at (1,0.5) {};
-        \node[edge, label={[lab, dulceosc]above:$-(\tfrac12,1)$}] at (0.5,1) {};
-        \node[edge, label={[lab, dulceosc]left:$-(0,\tfrac12)$}]  at (0,0.5) {};
-        % 2-celda: dos coordenadas fraccionarias
-        \node[face, label={[lab]below:$f=(\tfrac12,\tfrac12)$}] at (0.5,0.5) {};
-      \end{tikzpicture}
-    
-    
- 
-\end{frame}
-
-\begin{frame}{Operador de borde}
-  % GUION (0:30): el borde de una celda se obtiene moviendo cada coordenada fraccionaria
-  % medio paso hacia adelante (+) y hacia atrás (-), con un signo eps que fija la orientación.
-  % Ejemplo, la cara f=(1/2,1/2): en la dirección 1 da la arista derecha menos la izquierda;
-  % en la dirección 2, con signo -, la de arriba menos la de abajo. Resultado: el recorrido
-  % antihorario. Para una arista da "cabeza menos cola", y siempre se cumple que el borde
-  % de un borde es 0: es lo que usamos después para las cargas conservadas.
-  \centering
-  $\partial x=\sum_{i\,\in\,J_x}\varepsilon_{J_x}(i)\,\Big[\big(x+\tfrac12 e_i\big)-\big(x-\tfrac12 e_i\big)\Big]$\\[1mm]
-  {\small $J_x$ = coordenadas fraccionarias de $x$, \quad $\varepsilon_{J}(i)=(-1)^{\#\{j\in J\,:\,j<i\}}$}
-  \vspace{2mm}
-
-  \begin{columns}[c]
-    \begin{column}{0.42\textwidth}
-      \centering
-      \begin{tikzpicture}[scale=2.5,
-          vert/.style={circle, fill=cafe, inner sep=0pt, minimum size=5pt},
-          pt/.style={circle, inner sep=0pt, minimum size=6pt},
-          face/.style={rectangle, fill=caramelo, draw=dulceosc, inner sep=0pt, minimum size=7pt},
-          lab/.style={font=\footnotesize}]
-        \fill[leche] (0,0) rectangle (1,1);
-        \draw[cafe!40, thick] (0,0) rectangle (1,1);
-        \foreach \p in {(0,0),(1,0),(1,1),(0,1)} \node[vert] at \p {};
-        \node[face, label={[lab]above:$f$}] at (0.5,0.5) {};
-        % i = 1: mover la primera coordenada en ±1/2
-        \uncover<2->{
-          \draw[dulce, thick, dashed, -{Stealth[length=2mm]}] (0.56,0.5) -- (0.93,0.5);
-          \draw[dulce, thick, dashed, -{Stealth[length=2mm]}] (0.44,0.5) -- (0.07,0.5);
-          \node[pt, fill=dulce, label={[lab, dulce]right:$+\,(1,\tfrac12)$}] at (1,0.5) {};
-          \node[pt, fill=dulce, label={[lab, dulce]left:$-\,(0,\tfrac12)$}] at (0,0.5) {};
-        }
-        % i = 2: mover la segunda coordenada en ±1/2 (con ε = -1)
-        \uncover<3->{
-          \draw[cafeleche, thick, dashed, -{Stealth[length=2mm]}] (0.5,0.56) -- (0.5,0.93);
-          \draw[cafeleche, thick, dashed, -{Stealth[length=2mm]}] (0.5,0.44) -- (0.5,0.07);
-          \node[pt, fill=cafeleche, label={[lab, cafeleche]above:$-\,(\tfrac12,1)$}] at (0.5,1) {};
-          \node[pt, fill=cafeleche, label={[lab, cafeleche]below:$+\,(\tfrac12,0)$}] at (0.5,0) {};
-        }
-        % resultado: recorrido antihorario
-        \uncover<4->{
-          \foreach \a/\b in {{(0.66,0)/(0.88,0)}, {(1,0.66)/(1,0.88)}, {(0.34,1)/(0.12,1)}, {(0,0.34)/(0,0.12)}}
-            \draw[dulceosc, very thick, -{Stealth[length=2.6mm]}] \a -- \b;
-        }
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.56\textwidth}
-      Ejemplo: $f=(\tfrac12,\tfrac12)$, \; $J_f=\{1,2\}$
-      \vspace{3mm}
-
-      \uncover<2->{\textcolor{dulce}{$i=1$:} \; $\varepsilon=+1$ \; $\Rightarrow\; +\big[(1,\tfrac12)-(0,\tfrac12)\big]$}\\[2mm]
-      \uncover<3->{\textcolor{cafeleche}{$i=2$:} \; $\varepsilon=-1$ \; $\Rightarrow\; -\big[(\tfrac12,1)-(\tfrac12,0)\big]$}
-      \vspace{4mm}
-
-      \uncover<4->{%
-        $\partial f=(\tfrac12,0)+(1,\tfrac12)-(\tfrac12,1)-(0,\tfrac12)$ \; \alert{$\circlearrowleft$}\\[3mm]
-        {\small arista: $\partial(\tfrac12,0)=(1,0)-(0,0)$ \quad y \quad $\partial\partial f=0$}}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Laplaciano up}
-  % GUION (0:30): con el borde se arma el Laplaciano up, Delta = ∂_2 ∂_2^T: a una arista le
-  % aplica el borde de cada cara que la contiene, con el signo de la orientación. Ejemplo:
-  % la arista e, compartida por f1 y f2, recibe un 2 (número de caras que la contienen) y las
-  % otras seis aristas de esas caras reciben +-1. Por qué importa: en el proceso, cada
-  % partícula en e suena con cada cara a tasa 1 y resta <e,∂f> sgn(θ_e) ∂f; sumando, el
-  % cambio esperado de θ es exactamente -Delta θ (porque |θ_e| sgn θ_e = θ_e). La media del
-  % proceso sigue la ecuación del calor de Hodge; la ramificación está en las fluctuaciones.
-  \centering
-  $\Delta_1^{\uparrow}=\partial_2\,\partial_2^{\top},\qquad \Delta_1^{\uparrow}\theta=\sum_{f}\ip{\theta}{\partial f}\,\partial f$
-  \vspace{2mm}
-
-  \begin{columns}[c]
-    \begin{column}{0.38\textwidth}
-      \centering
-      \begin{tikzpicture}[scale=1.55, lab/.style={font=\footnotesize}]
-        \fill[leche] (0.06,0.06) rectangle (0.94,0.94);
-        \fill[leche] (0.06,1.06) rectangle (0.94,1.94);
-        \node at (0.5,0.5) {$f_1$}; \node at (0.5,1.5) {$f_2$};
-        % aristas con coeficiente +
-        \draw[very thick, rojo] (0,1) -- (1,1)     node[midway, above, lab, xshift=-7pt] {$+2$};
-        \draw[very thick, rojo] (0,0) -- (0,1)     node[midway, left, lab] {$+1$};
-        \draw[very thick, rojo] (1,1) -- (1,2)     node[midway, right, lab] {$+1$};
-        % aristas con coeficiente -
-        \draw[very thick, azul] (0,0) -- (1,0)     node[midway, below, lab] {$-1$};
-        \draw[very thick, azul] (0,2) -- (1,2)     node[midway, above, lab] {$-1$};
-        \draw[very thick, azul] (1,0) -- (1,1)     node[midway, right, lab] {$-1$};
-        \draw[very thick, azul] (0,1) -- (0,2)     node[midway, left, lab] {$-1$};
-        \node[lab, rojo] at (0.8,0.86) {$e$};
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.58\textwidth}
-      
-      \[
-        \Delta_1^{\uparrow}e=\ip{e}{\partial f_1}\,\partial f_1+\ip{e}{\partial f_2}\,\partial f_2=-\partial f_1+\partial f_2
-      \]
-
-      \alert{En el proceso:} \; $\mathcal{L}I(\theta)=-\Delta_1^{\uparrow}\theta$\\[1mm]
-      {\small la media sigue el calor de Hodge: $\;\mathbb{E}[\theta_t]=e^{-t\Delta_1^{\uparrow}}\theta_0$}
-    \end{column}
-  \end{columns}
+  \uncover<3->{misma regla, una dimensión más arriba: \alert{se resta el borde}}
 \end{frame}
 
 \begin{frame}{De los grafos a las Celdas}
-  % GUION (0:20): un paseo aleatorio vive en vértices; aquí las partículas viven en aristas
-  % y tienen carga (+ rojo, - azul). Las que interactúan son las caras (cuadraditos).
+  % GUION (0:20): en notación: las partículas viven en aristas y tienen carga
+  % (+ rojo, - azul). Las que interactúan son las caras (cuadraditos).
   % La regla: cuando una cara "suena" se le resta su borde. Lo vemos en acción ->
   \centering
   \begin{tikzpicture}[scale=1.3]
