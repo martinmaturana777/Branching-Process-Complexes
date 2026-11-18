@@ -405,7 +405,7 @@ Basado en el borrador \emph{Branching process on complexes} de D.~Cid y A.~Sepú
 
 \begin{frame}{Stochastic Ninja Warrior: ¿quién sobrevive?}
   \begin{itemize}
-    \item La simulación sigue siendo \textbf{exacta}: entre dos eventos, el obstáculo barre todas sus posiciones intermedias, así que no ``salta'' por encima de nadie.
+    \item La simulación sigue siendo \textbf{exacta}: cada vez que el obstáculo se mueve, elimina lo que toca y el reloj se vuelve a sortear.
     \item Con un $T$ que se mueve, las cargas ya \textbf{no} se conservan, así que la extinción es posible.
     \item Aun así, nadie llega a GAME OVER: la ramificación y las eliminaciones se \textbf{equilibran}.
   \end{itemize}
@@ -415,8 +415,8 @@ Basado en el borrador \emph{Branching process on complexes} de D.~Cid y A.~Sepú
       \toprule
       prueba (3 ciclos) & eliminadas & siguen en carrera \\
       \midrule
-      cruz giratoria & 298 & 20 \\
-      anillo que oscila & 184 & 10 \\
+      cruz giratoria & 218 & 10 \\
+      anillo que oscila & 141 & 9 \\
       \bottomrule
     \end{tabular}
   \end{center}

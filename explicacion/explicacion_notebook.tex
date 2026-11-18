@@ -376,7 +376,7 @@ mediante \fn{particle_weights} y \fn{sample_edge}, que llama a \fn{rng.choice(p=
 \noindent\textit{Cargas entrantes.} $-c\,\partial_Tf$, leyendo la columna $f$ de $\partial_T$ en formato CSC (\fn{incoming_charges}). Son a lo más cuatro aristas.
 
 \medskip
-\noindent\textit{Conteo de aniquilaciones.} Antes de sumar, \fn{count_annihilations} cuenta las cargas entrantes de signo opuesto a la ocupación actual: $\theta_e\cdot q<0$.
+\noindent\textit{Conteo de aniquilaciones.} Antes de sumar, \fn{count_annihilations} cuenta las cargas entrantes de signo opuesto a la ocupación actual: $\theta_e\cdot q<0$. Ese número $a$ incluye siempre a la partícula detonante, así que $a\ge1$ (Proposición~\ref{prop:conteo}). Las aniquilaciones entre cargas opuestas propiamente tales son $a-1$, y eso es lo que muestran los videos.
 
 \medskip
 \noindent\textit{Actualización.} \fn{theta[edges] += charges}. Aquí la aniquilación es automática: $(+1)+(-1)=0$ en los enteros. No hace falta lógica especial: \textbf{la aritmética de $\Z$ es la regla de aniquilación}.
@@ -442,7 +442,7 @@ Antes del bucle, \fn{run_branching_process(theta0, n_steps, cx, kill_mask, rando
   \item arma $\partial_T$ en dos formatos: CSR, para leer filas (caras de una arista), y CSC, para leer columnas (aristas de una cara);
   \item precalcula $\lambda$ y \fn{killed_per_face}, el número de aristas de cada cara que están en $T$;
   \item anula $\theta_0$ sobre $T$ (\fn{project_out_killed}) y lo copia a un \textbf{búfer de trabajo} privado;
-  \item acepta un horizonte \fn{t_max}: si el reloj lo supera, la simulación se corta (\emph{censura});
+  \item acepta un horizonte \fn{t_max}: si el reloj lo supera, la simulación se corta (\emph{censura}). El corte se revisa antes de cada evento, así que el último evento registrado ya ocurrió después de \fn{t_max} y el estado final no es $\theta_{t_{\max}}$. Por eso la extinción antes de $t^\ast$ se mide con \fn{extinct & (tau <= t*)};
   \item acepta un tamaño máximo \fn{l1_max}: si $\norm{\theta}_1$ lo alcanza, la simulación se corta. Se usa para medir la extinción temprana en 3D.
 \end{itemize}
 La estructura \fn{for}\dots\fn{else} de Python distingue si el bucle terminó por extinción (\fn{break}) o por agotar los pasos. La ``inmutabilidad'' funciona así: $\theta_0$ y el historial nunca cambian después de crearse, y lo único mutable es el búfer interno, que nadie más ve.
@@ -573,7 +573,7 @@ Esta es la sección~5 del notebook. La convención visual es la misma en 2D y en
   \item partículas $+$ en rojo y $-$ en azul;
   \item el proceso de alturas $\eta$ de fondo (en 3D, como placas translúcidas);
   \item el conjunto absorbente $T$ (el árbol generador) en verde pálido;
-  \item a la derecha, $\norm{\theta_t}_1$ y las aniquilaciones y absorciones acumuladas.
+  \item a la derecha, $\norm{\theta_t}_1$ y las aniquilaciones (entre cargas opuestas, sin contar la partícula detonante) y absorciones acumuladas.
 \end{itemize}
 
 \subsection{Dibujo en dos dimensiones}
@@ -586,7 +586,7 @@ Esta es la sección~5 del notebook. La convención visual es la misma en 2D y en
   \item[\fn{draw_lattice_background}] La grilla en gris claro y $T$ en verde pálido, con trazo grueso.
   \item[\fn{init_height_layer}] \fn{imshow} de $\eta$ con un mapa de colores divergente y transparencia.
   \item[\fn{init_particle_layers}, \fn{update_particle_layers}] Un \fn{LineCollection} con todas las aristas coloreadas por carga y un \fn{scatter} con tamaño proporcional a $\sqrt{|\theta_e|}$.
-  \item[\fn{init_norm_panel}, \fn{init_counts_panel}] $\norm{\theta_t}_1$ arriba y aniquilaciones y absorciones acumuladas abajo, cada panel con un cursor rojo.
+  \item[\fn{init_norm_panel}, \fn{init_counts_panel}] $\norm{\theta_t}_1$ arriba y aniquilaciones y absorciones acumuladas abajo, cada panel con un cursor rojo. Las aniquilaciones se grafican como $\sum_t(a_t-1)$: la partícula detonante no se cuenta.
   \item[\fn{build_animation_figure}] Arma la figura con los tres paneles.
   \item[\fn{make_frame_updater}] Crea la función \fn{update(j)} que pide \fn{FuncAnimation}, como \emph{closure} sobre los datos precalculados.
   \item[\fn{animate_process}, \fn{save_animation}, \fn{render_video}, \fn{show_video}] Reconstruir y animar; guardar en MP4 con ffmpeg (o GIF con Pillow si no hay ffmpeg); todo junto cerrando la figura; mostrar el video en el notebook.
@@ -753,8 +753,9 @@ donde $\text{disco}(r)$ son las caras con baricentro a distancia $\le r$ del cen
 
 \paragraph{Simulación exacta con obstáculo móvil} (\fn{run_moving_obstacle}). El obstáculo se discretiza en 720 posiciones por ciclo (\fn{obstacle_table}).
 \begin{itemize}[nosep]
-  \item En cada evento, las cargas que caen sobre $T(t)$ mueren, igual que con un conjunto absorbente fijo.
-  \item Entre eventos las partículas no se mueven. Cuando el reloj avanza de $t$ a $t'$, el obstáculo pasa por todas sus posiciones intermedias, y en cada una elimina a las partículas que encuentra. Así el obstáculo no ``salta por encima'' de nadie, aunque haya pocas partículas y los tiempos entre eventos sean largos.
+  \item $T(t)$ es constante en cada fase $[k\,P/n,(k+1)P/n)$, con $P=12$ y $n=720$. Desde el tiempo $t$ se sortea $\Delta\sim\mathrm{Exp}(\ip{|\theta|}{\lambda})$.
+  \item Si $t+\Delta$ llega al próximo cambio de fase, el reloj avanza solo hasta ese cambio, el obstáculo elimina a las partículas que encuentra en su nueva posición, se recalcula la tasa y se vuelve a sortear. Por la falta de memoria de la exponencial, descartar $\Delta$ no introduce sesgo. Así el obstáculo no ``salta por encima'' de nadie, y la tasa siempre corresponde a las partículas que siguen vivas.
+  \item Si no, el evento ocurre en $t+\Delta$ con el obstáculo vigente, y las cargas que caen sobre $T(t)$ mueren, igual que con un conjunto absorbente fijo.
   \item El estado se guarda directamente en los tiempos de los cuadros, porque con $T$ variable ya no sirve la reconstrucción $\theta_t=\theta_0+\partial_T\eta_t$.
 \end{itemize}
 Con un $T$ que cambia, las cargas de la Proposición~\ref{prop:cargas} dejan de conservarse, así que la extinción es posible. Aun así, en las pruebas el obstáculo no alcanza a eliminar a todos: la población se estabiliza en unas decenas de partículas, en equilibrio entre la ramificación y las eliminaciones.
@@ -857,14 +858,14 @@ Cada componente de $(V,T')$ es unión de componentes de $(V,T)$, y la carga es a
 
 \paragraph{Verificación.} En la caja $9\times9$, con $T$ formado por $k$ aristas uniformes y una partícula, se simularon 300 réplicas por cada $k\in\{0,20,\dots,140\}$ (\fn{check_charge_prediction}). Las réplicas en que la extinción es posible se simulan hasta $3\cdot10^5$ eventos, y las demás hasta $2\cdot10^4$. La función \fn{plot_prediction_check} muestra el resultado (figura~\ref{fig:verificacion}):
 \begin{itemize}[nosep]
-  \item a la izquierda, la proporción de réplicas en que la extinción es posible según las cargas, junto a la proporción que efectivamente se extinguió; las dos curvas coinciden para todo $k$;
-  \item a la derecha, la matriz predicción $\times$ observación de las 2400 réplicas: solo la diagonal tiene réplicas. \textbf{Ninguna} réplica ``imposible'' se extinguió y \textbf{todas} las ``posibles'' se extinguieron.
+  \item cada barra es la proporción de réplicas en que la extinción es posible según las cargas, y cada punto la proporción que efectivamente se extinguió; coinciden para todo $k$;
+  \item el título cuenta los errores réplica a réplica sobre las 2400 réplicas: \textbf{ninguna} réplica ``imposible'' se extinguió y \textbf{todas} las ``posibles'' se extinguieron.
 \end{itemize}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\textwidth]{figuras/verificacion_cargas.png}
-\caption{Verificación de la Proposición~\ref{prop:cargas} y el Corolario~\ref{cor:imposible}: predicción por cargas contra simulación, con bandas de Wilson al 95\,\%, y matriz de confusión.}
+\includegraphics[width=0.75\textwidth]{figuras/verificacion_cargas.png}
+\caption{Verificación de la Proposición~\ref{prop:cargas} y el Corolario~\ref{cor:imposible}: predicción por cargas (barras) contra simulación (puntos), con 300 réplicas por cada $k$.}
 \label{fig:verificacion}
 \end{figure}
 
@@ -909,11 +910,11 @@ Con 5000 muestras por regla y condición inicial (figura~\ref{fig:aristas-exacta
 
 \subsection{Resultados en \texorpdfstring{$\Z^2$}{Z2}: extinción en tiempo finito}
 
-Que la extinción sea posible no dice cuánto tarda. El notebook mide $\mathbb{P}(\tau\le t^\ast)$ con $t^\ast=50$, con 1000 réplicas por punto y bandas de Wilson (figura~\ref{fig:aristas-finito}). Siempre $\mathbb{P}(\tau\le t^\ast)\le\mathbb{P}(\tau<\infty)$.
+Que la extinción sea posible no dice cuánto tarda. El notebook mide $\mathbb{P}(\tau\le t^\ast)$ con $t^\ast=50$, con 1000 réplicas por punto e intervalos de Wilson (figura~\ref{fig:aristas-finito}). Siempre $\mathbb{P}(\tau\le t^\ast)\le\mathbb{P}(\tau<\infty)$.
 
 \begin{itemize}
   \item \textbf{Una partícula, reglas uniforme y árbol aleatorio:} $\mathbb{P}(\tau\le50)$ sigue de cerca la cota exacta. Una vez que la extinción es posible, ocurre rápido.
-  \item \textbf{Lazo:} $\mathbb{P}(\tau\le50)$ \textbf{baja} de $1.00$ ($T=\emptyset$) a $0.94$ con un árbol generador completo: agregar aristas absorbentes hace más lenta la extinción. Con la regla uniforme baja hasta $\approx0.977$ y vuelve a $1$ cuando $T$ cubre las aristas del lazo, que entonces muere en $t=0$.
+  \item \textbf{Lazo:} $\mathbb{P}(\tau\le50)$ \textbf{baja} de $1.00$ ($T=\emptyset$) a $0.94$ con un árbol generador completo: agregar aristas absorbentes hace más lenta la extinción. Con la regla uniforme baja hasta $\approx0.98$ y vuelve a $1$ cuando $T$ cubre las aristas del lazo, que entonces muere en $t=0$.
 \end{itemize}
 
 \noindent La extinción en tiempo finito \textbf{no es monótona} en $T$, aunque la eventual sí lo sea. Esto ya se veía en un experimento previo en $5\times5$ con el lazo: con $T$ igual al borde de la caja, la probabilidad de sobrevivir más de 200 eventos era 16 veces la de $T=\emptyset$.
@@ -923,7 +924,7 @@ Que la extinción sea posible no dice cuánto tarda. El notebook mide $\mathbb{P
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figuras/aristas_tiempo_finito.png}
-\caption{$\hat{\mathbb{P}}(\tau\le50)$ en función de $k$, con banda de Wilson al 95\,\% (línea continua), y la probabilidad eventual exacta (línea discontinua). En el panel del lazo la escala vertical está ampliada.}
+\caption{$\hat{\mathbb{P}}(\tau\le50)$ en función de $k$ (puntos, con intervalos de Wilson al 95\,\%) y la probabilidad eventual exacta (línea discontinua). En el panel del lazo la escala vertical está ampliada.}
 \label{fig:aristas-finito}
 \end{figure}
 
@@ -975,7 +976,7 @@ estimada con \fn{l1_max} y 600 réplicas por punto (figura~\ref{fig:aristas-3d})
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{figuras/aristas_3d.png}
-\caption{$\Z^3$, caja $9\times9\times9$: extinción eventual exacta (línea discontinua) y extinción temprana $\hat q_{100}$ con banda de Wilson (línea continua).}
+\caption{$\Z^3$, caja $9\times9\times9$: extinción eventual exacta (línea discontinua) y extinción temprana $\hat q_{100}$ (puntos, con intervalos de Wilson).}
 \label{fig:aristas-3d}
 \end{figure}
 
@@ -1121,7 +1122,7 @@ probabilidad eventual (muestras de $k^\ast$) & 5000 & $\pm$1.4\,\% \\
 
 \noindent El \emph{error estándar} es la mitad de estos números, aproximadamente: 1.6\,\% con $R=1000$.
 
-\paragraph{Comparar dos puntos.} Para decidir si una curva ``baja'' entre dos valores de $k$, el notebook cuenta una bajada como significativa si supera dos errores estándar. Es un criterio aproximado, no un test formal con corrección por comparaciones múltiples. Por eso, para afirmar la no monotonía se usaron sobre todo diferencias grandes y sistemáticas, como la del lazo, de $1.00$ a $0.94$ con intervalos que no se superponen.
+\paragraph{Comparar dos puntos.} Para decidir si una curva ``baja'' entre dos valores de $k$, el notebook cuenta una bajada como significativa si supera dos errores estándar de la diferencia, $2\sqrt{\big(\hat p_k(1-\hat p_k)+\hat p_{k'}(1-\hat p_{k'})\big)/R}$, porque los dos puntos son estimaciones independientes (cada punto usa su propia semilla). Es un criterio aproximado, no un test formal con corrección por comparaciones múltiples. Por eso, para afirmar la no monotonía se usaron sobre todo diferencias grandes y sistemáticas, como la del lazo, de $1.00$ a $0.94$ con intervalos que no se superponen.
 
 \subsection{La probabilidad eventual: un cálculo exacto}\label{sec:fund-exacta}
 
