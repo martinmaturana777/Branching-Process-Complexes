@@ -427,10 +427,31 @@
   \videogrande{z2_T_creciente_lazo}{z2_T_creciente_lazo.mp4}
 \end{frame}
 
+\begin{frame}{¿Importa el orden? Kruskal vs árbol revelado}
+  \centering
+  \includegraphics[width=0.9\textwidth]{comparar_orden.png}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $9\times9$ · árbol revelado: se sortea el árbol y sus aristas entran en orden uniforme ·
+  mismo árbol y misma condición inicial con los dos órdenes · 2000 réplicas por punto · IC al 95\,\%\par}
+\end{frame}
+
 \begin{frame}{En 3D: meseta cuasi-estacionaria hasta la extinción}
   \vspace{9pt}
   \videogrande[0.67]{z3_10particulas_hasta_extincion}{z3_10particulas_hasta_extincion.mp4}\\[1mm]
   {\small $3\times3\times3$, sin selección: \alert{90\,M} eventos hasta la extinción (lazo: 23\,M)}
+\end{frame}
+
+\begin{frame}{Tiempo de extinción con árbol generador: $d=2$}
+  \centering
+  \includegraphics[height=0.66\textheight]{tiempos_extincion_2d.png}\\[1mm]
+  {\footnotesize\color{cafeleche} $T$ = árbol generador al azar que evita $\theta_0$ · cajas $L\times L$ ·
+  2000 réplicas por punto · $N$ partículas $+1$ en aristas al azar\par}
+\end{frame}
+
+\begin{frame}{Tiempo de extinción con árbol generador: $d=3$}
+  \centering
+  \includegraphics[height=0.66\textheight]{tiempos_extincion_3d.png}\\[1mm]
+  {\footnotesize\color{cafeleche} $T$ = árbol generador al azar que evita $\theta_0$ · $L=2,3$: 1000 réplicas hasta la extinción ·
+  $L=4$: 100 réplicas con tope de $10^9$ eventos\par}
 \end{frame}
 
 \begin{frame}{Extinción vs número de aristas absorbentes}
@@ -452,19 +473,19 @@
   {\footnotesize\color{cafeleche} caja $5\times5\times5$ · $|E|=540$ aristas · 1000 réplicas por punto}
 \end{frame}
 
-\begin{frame}{Con 35 aristas absorbentes, ¿dónde ponerlas?}
-  \centering
-  \includegraphics[height=0.7\textheight]{config_simple.png}\\[1mm]
-  {\footnotesize\color{cafeleche} caja $9\times9$ · 1 partícula en una arista al azar fuera de $T$ ·
-  2000 sorteos de $T$ (exacta) y 2000 réplicas (antes de $t=50$) por configuración\par}
-\end{frame}
-
 \begin{frame}{Extinción vs Distribución de Aristas}
   \centering
   \includegraphics[width=0.8\textwidth]{config_curvas.png}\\[1mm]
   {\footnotesize\color{cafeleche} caja $9\times9$ · 1 partícula en una arista al azar fuera de $T$ ·
   líneas: exacta por cargas (2000 muestras de $T$ por $k$ en las reglas aleatorias) ·
   puntos: 2000 réplicas, $t^\ast=50$, IC de Wilson al 95\,\%}
+\end{frame}
+
+\begin{frame}{Stochastic Ninja Warrior: el anillo}
+  \vspace{9pt}
+  \videogrande[0.64]{ninja_anillo}{ninja_anillo.mp4}\\[1mm]
+  {\footnotesize\color{cafeleche} caja $15\times15$ · 8 concursantes, 2 en el bloque $3\times3$ del centro ·
+  radio $6{,}5\to1{,}5$ · primera semilla\par}
 \end{frame}
 
 % =====================================================================

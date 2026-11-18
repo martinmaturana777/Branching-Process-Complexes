@@ -16,7 +16,8 @@ Si el video tiene más de N_MAX cuadros, se eligen N_MAX equiespaciados (time-la
 Siempre se incluyen el primer y el último cuadro, así se ve el estado final.
 
 Uso (desde cualquier carpeta):
-    python presentacion/convertir_videos.py
+    python presentacion/convertir_videos.py            (todos)
+    python presentacion/convertir_videos.py ninja_anillo   (solo los nombrados)
 Requiere ffmpeg y ffprobe.
 """
 import shutil
@@ -33,6 +34,7 @@ VIDEOS = [                      # los que usa la presentación
     "z2_T_creciente_1particula",
     "z2_T_creciente_lazo",
     "z3_10particulas_hasta_extincion",
+    "ninja_anillo",
 ]
 N_MAX = 120         # cuadros por animación como máximo
 FPS_MIN = 10        # cuadros por segundo mínimos de la animación
@@ -105,10 +107,11 @@ def convertir(nombre: str) -> float:
 def main() -> None:
     if shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None:
         sys.exit("No encuentro ffmpeg. Instálalo y vuelve a abrir la terminal.")
-    faltan = [v for v in VIDEOS if not (CARPETA_VIDEOS / f"{v}.mp4").exists()]
+    videos = sys.argv[1:] or VIDEOS
+    faltan = [v for v in videos if not (CARPETA_VIDEOS / f"{v}.mp4").exists()]
     if faltan:
         sys.exit(f"Faltan videos en {CARPETA_VIDEOS}: {', '.join(faltan)}")
-    peso = sum(convertir(v) for v in VIDEOS)
+    peso = sum(convertir(v) for v in videos)
     print(f"\nListo: {peso:.1f} MB en {SALIDA}")
 
 
